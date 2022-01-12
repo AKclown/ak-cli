@@ -1,0 +1,7 @@
+.vscode
+.idea
+node_modules
+
+# **表示通配符，无论package下是什么 都会配置到package所有的node_modules
+packages/**/node_modules
+packages/**/package-lock.json

@@ -1,0 +1,34 @@
+{
+  "name": "@ak-cli/core",
+  "version": "1.0.0",
+  "description": "> TODO: description",
+  "author": "AKclown <13413629530@139.com>",
+  "homepage": "",
+  "license": "ISC",
+  "main": "lib/index.js",
+  "bin": {
+    "ak-cli": "lib/index.js"
+  },
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "publishConfig": {
+    "registry": "http://npm.tuzhanai.com"
+  },
+  "dependencies": {
+    "@ak-cli/log": "file:../../utils/log",
+    "@ak-cli/utils": "file:../../utils/utils",
+    "color": "^4.2.0",
+    "colors": "^1.4.2",
+    "import-local": "^3.0.3",
+    "npmlog": "^6.0.0",
+    "semver": "^7.3.5"
+  },
+  "scripts": {
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  }
+}
