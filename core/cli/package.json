@@ -18,14 +18,14 @@
     "lib"
   ],
   "publishConfig": {
-    "registry": "http://npm.tuzhanai.com"
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
   },
   "dependencies": {
     "@ak-clown/get-npm-info": "^1.0.2",
     "@ak-clown/log": "^1.0.2",
     "@ak-clown/utils": "^1.0.2",
-    "color": "^4.2.0",
-    "colors": "^1.4.2",
+    "colors": "^1.4.0",
     "commander": "^8.3.0",
     "dotenv": "^11.0.0",
     "import-local": "^3.0.3",
@@ -39,5 +39,5 @@
   "scripts": {
     "test": "echo \"Error: run tests from root\" && exit 1"
   },
-  "gitHead": "cf17ebedfbe629ed1182eec1b67d5d6d9dc8b5ca"
+  "gitHead": "a97c4362c48738ad3ba3519cad470f552ff69ffb"
 }

@@ -14,7 +14,8 @@
     "lib"
   ],
   "publishConfig": {
-    "registry": "http://npm.tuzhanai.com"
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
   },
   "repository": {
     "type": "git",
@@ -31,5 +32,5 @@
     "semver": "^7.3.5",
     "url-join": "^4.0.1"
   },
-  "gitHead": "cf17ebedfbe629ed1182eec1b67d5d6d9dc8b5ca"
+  "gitHead": "a97c4362c48738ad3ba3519cad470f552ff69ffb"
 }
