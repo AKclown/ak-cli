@@ -1,7 +1,7 @@
 #! /usr/bin/env node
 
 const pkg = require('../package.json');
-const log = require('@ak-cli/log');
+const log = require('@ak-clown/log');
 const constant = require('./constants');
 const colors = require('colors');
 const semver = require('semver');
@@ -19,6 +19,7 @@ function core() {
     checkUserHome();
     checkInputArgs();
     checkEnv();
+    checkGlobalUpdate();
   } catch (error) {
     log.error(error.message)
   }
@@ -94,4 +95,22 @@ function createDefaultConfig() {
     cliConfig['cliHome'] = path.join(userHome, constants.DEFAULT_CLI_HOME);
   }
   return cliConfig;
+}
+
+async function checkGlobalUpdate() {
+  // 1. 获取当前版本号和模块名
+  const currentVersion = pkg.version;
+  // const npmName = pkg.name;
+  //  !!!暂时写死
+  const npmName = '@imooc-cli-dev/core';
+  // 2. 调用NPM API 获取所有版本号
+  const { getNpmSemverVersion } = require('@ak-clown/get-npm-info');
+  const lastVersion = await getNpmSemverVersion(currentVersion, npmName);
+  // 3. 提取所有版本号，对比那些版本号是大于当前版本
+  // 4. 获取最新的版本号，提示用户更新到该版本
+  if (lastVersion && semver.gt(lastVersion, currentVersion)) {
+    log.warn('更新提醒', colors.yellow(`请手动更新${npmName},当前版本:${currentVersion},
+    最新版本为${lastVersion}
+    更新命令: npm install -g ${npmName}`))
+  }
 }

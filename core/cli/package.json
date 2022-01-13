@@ -1,5 +1,5 @@
 {
-  "name": "@ak-cli/core",
+  "name": "@ak-clown/core",
   "version": "1.0.0",
   "description": "> TODO: description",
   "author": "AKclown <13413629530@139.com>",
@@ -20,8 +20,9 @@
     "registry": "http://npm.tuzhanai.com"
   },
   "dependencies": {
-    "@ak-cli/log": "file:../../utils/log",
-    "@ak-cli/utils": "file:../../utils/utils",
+    "@ak-clown/log": "file:../../utils/log",
+    "@ak-clown/utils": "file:../../utils/utils",
+    "@ak-clown/get-npm-info": "file:../../utils/get-npm-info",
     "color": "^4.2.0",
     "colors": "^1.4.2",
     "dotenv": "^11.0.0",
