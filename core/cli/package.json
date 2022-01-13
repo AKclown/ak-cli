@@ -7,7 +7,8 @@
   "license": "ISC",
   "main": "lib/index.js",
   "bin": {
-    "ak-cli": "lib/index.js"
+    "ak-cli": "lib/index.js",
+    "learn-commander": "lib/commander-test.js"
   },
   "directories": {
     "lib": "lib",

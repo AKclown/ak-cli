@@ -19,9 +19,9 @@ function core() {
     checkUserHome();
     checkInputArgs();
     checkEnv();
-    checkGlobalUpdate();
+    await checkGlobalUpdate();
   } catch (error) {
-    log.error(error.message)
+    log.error(error.message);
   }
 }
 core();
