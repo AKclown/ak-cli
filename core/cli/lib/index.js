@@ -11,7 +11,8 @@ const pathExists = require("path-exists");
 const path = require('path');
 const constants = require('./constants');
 const commander = require('commander');
-const init = require('@ak-clown/init')
+const init = require('@ak-clown/init');
+const exec = require('@ak-clown/exec');
 
 const program = new commander.Command();
 
@@ -38,12 +39,18 @@ function registerCommand() {
     .name(Object.keys(pkg.bin)[0])
     .usage('<command> [options]')
     .option('-d, --debug', '是否开启调试模式')
-    .version(pkg.version)
+    .option('-tp, --targetPath <targetPath>', '是否指定本地调试文件路径', '')
 
   program
     .command('init [projectName]')
     .option('-f --force', '是否强制初始化项目')
-    .action(init)
+    .action(exec)
+
+  // $ 指定targetPath
+  program.on('option:targetPath', function () {
+    const options = program.opts();
+    process.env.CLI_TARGET_PATH = options.targetPath;
+  })
 
   // $ 实现debug功能
   program.on('option:debug', function () {
