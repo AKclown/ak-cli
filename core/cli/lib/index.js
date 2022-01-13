@@ -11,17 +11,18 @@ const pathExists = require("path-exists");
 const path = require('path');
 const constants = require('./constants');
 const commander = require('commander');
+const init = require('@ak-clown/init')
 
 const program = new commander.Command();
 
-function core() {
+async function core() {
   try {
     // $ 准备阶段执行方法
     checkPkgVersion();
     checkNodeVersion();
     checkRoot();
     checkUserHome();
-    checkInputArgs();
+    // checkInputArgs();
     checkEnv();
     await checkGlobalUpdate();
     // $ 命令注册执行方法
@@ -33,12 +34,50 @@ function core() {
 core();
 
 function registerCommand() {
-  
+  program
+    .name(Object.keys(pkg.bin)[0])
+    .usage('<command> [options]')
+    .option('-d, --debug', '是否开启调试模式')
+    .version(pkg.version)
+
+  program
+    .command('init [projectName]')
+    .option('-f --force', '是否强制初始化项目')
+    .action(init)
+
+  // $ 实现debug功能
+  program.on('option:debug', function () {
+    const options = program.opts();
+    if (options.debug) {
+      process.env.LOG_LEVEL = 'verbose';
+    } else {
+      process.env.LOG_LEVEL = 'info';
+    }
+    log.level = process.env.LOG_LEVEL;
+    log.verbose('开启debug模式')
+  })
+
+  // $ 监听未知命令
+  program.on('command:*', function (obj) {
+    console.error(`未知命令${obj[0]}`);
+    const availableCommands = program.commands.map(cmd => cmd.name());
+    if (availableCommands.length > 0) {
+      console.log(`可用命令: ${availableCommands.join(',')}`);
+    }
+  })
+  program.parse(process.argv);
+  // $ 参数小于3个不解析，第一个是node 第二个是脚手架命令， 第三个才是option
+  // if (process.argv.length < 3) {
+  //   program.outputHelp();
+  // }
+  if (program.args && program.args.length < 1) {
+    program.outputHelp();
+  }
 }
 
 
 function checkPkgVersion() {
-  console.log(pkg.version);
+  // console.log(pkg.version);
 }
 
 function checkNodeVersion() {
@@ -111,8 +150,6 @@ async function checkGlobalUpdate() {
   // 1. 获取当前版本号和模块名
   const currentVersion = pkg.version;
   const npmName = pkg.name;
-  //  !!!暂时写死
-  // const npmName = '@imooc-cli-dev/core';
   // 2. 调用NPM API 获取所有版本号
   const { getNpmSemverVersion } = require('@ak-clown/get-npm-info');
   const lastVersion = await getNpmSemverVersion(currentVersion, npmName);
