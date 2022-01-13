@@ -10,9 +10,13 @@ const userHome = require('userhome')();
 const pathExists = require("path-exists");
 const path = require('path');
 const constants = require('./constants');
+const commander = require('commander');
+
+const program = new commander.Command();
 
 function core() {
   try {
+    // $ 准备阶段执行方法
     checkPkgVersion();
     checkNodeVersion();
     checkRoot();
@@ -20,11 +24,17 @@ function core() {
     checkInputArgs();
     checkEnv();
     await checkGlobalUpdate();
+    // $ 命令注册执行方法
+    registerCommand();
   } catch (error) {
     log.error(error.message);
   }
 }
 core();
+
+function registerCommand() {
+  
+}
 
 
 function checkPkgVersion() {
@@ -100,9 +110,9 @@ function createDefaultConfig() {
 async function checkGlobalUpdate() {
   // 1. 获取当前版本号和模块名
   const currentVersion = pkg.version;
-  // const npmName = pkg.name;
+  const npmName = pkg.name;
   //  !!!暂时写死
-  const npmName = '@imooc-cli-dev/core';
+  // const npmName = '@imooc-cli-dev/core';
   // 2. 调用NPM API 获取所有版本号
   const { getNpmSemverVersion } = require('@ak-clown/get-npm-info');
   const lastVersion = await getNpmSemverVersion(currentVersion, npmName);
