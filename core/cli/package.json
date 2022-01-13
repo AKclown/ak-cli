@@ -1,6 +1,6 @@
 {
   "name": "@ak-clown/core",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "> TODO: description",
   "author": "AKclown <13413629530@139.com>",
   "homepage": "",
@@ -21,9 +21,9 @@
     "registry": "http://npm.tuzhanai.com"
   },
   "dependencies": {
-    "@ak-clown/get-npm-info": "^1.0.0",
-    "@ak-clown/log": "^1.0.0",
-    "@ak-clown/utils": "^1.0.0",
+    "@ak-clown/get-npm-info": "^1.0.1",
+    "@ak-clown/log": "^1.0.1",
+    "@ak-clown/utils": "^1.0.1",
     "color": "^4.2.0",
     "colors": "^1.4.2",
     "commander": "^8.3.0",

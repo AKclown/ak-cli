@@ -1,6 +1,6 @@
 {
   "name": "@ak-clown/get-npm-info",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "获取npm相关信息",
   "author": "AKclown <13413629530@139.com>",
   "homepage": "https://github.com/AKclown/ak-cli#readme",
