@@ -21,9 +21,13 @@
     "url": "git+https://github.com/AKclown/ak-cli.git"
   },
   "dependencies": {
-    "@ak-clown/utils": "file:../../utils/utils",
     "@ak-clown/format-path": "file:../../utils/format-path",
-    "pkg-dir": "^6.0.1"
+    "@ak-clown/get-npm-info": "file:../../utils/get-npm-info",
+    "@ak-clown/utils": "file:../../utils/utils",
+    "fs-extra": "^10.0.0",
+    "npminstall": "^5.3.1",
+    "path-exists": "^4.0.0",
+    "pkg-dir": "^5.0.0"
   },
   "scripts": {
     "test": "echo \"Error: run tests from root\" && exit 1"

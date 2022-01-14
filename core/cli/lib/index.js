@@ -138,6 +138,7 @@ function checkEnv() {
   }
   // 设置默认值
   config = createDefaultConfig();
+  process.env.DEFAULT_CLI_HOME = config.cliHome;
   log.verbose('环境变量', config)
 }
 
@@ -146,9 +147,9 @@ function createDefaultConfig() {
     home: userHome
   }
   if (process.env.CLI_HOME) {
-    cliConfig['cliHome'] = path.join(userHome, process.env.CLI_HOME);
+    cliConfig.cliHome = path.join(userHome, process.env.CLI_HOME);
   } else {
-    cliConfig['cliHome'] = path.join(userHome, constants.DEFAULT_CLI_HOME);
+    cliConfig.cliHome = path.join(userHome, constants.DEFAULT_CLI_HOME);
   }
   return cliConfig;
 }
