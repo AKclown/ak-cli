@@ -8,7 +8,8 @@
   "main": "lib/index.js",
   "bin": {
     "ak-cli": "lib/index.js",
-    "learn-commander": "lib/commander-test.js"
+    "learn-commander": "lib/commander-test.js",
+    "learn-npm": "lib/npminstall-test.js"
   },
   "directories": {
     "lib": "lib",
@@ -22,16 +23,17 @@
     "registry": "https://registry.npmjs.org"
   },
   "dependencies": {
+    "@ak-clown/exec": "file:../exec",
     "@ak-clown/get-npm-info": "file:../../utils/get-npm-info",
+    "@ak-clown/init": "file:../../commands/init",
     "@ak-clown/log": "file:../../utils/log",
     "@ak-clown/utils": "file:../../utils/utils",
-    "@ak-clown/init": "file:../../commands/init",
-    "@ak-clown/exec": "file:../exec",
     "colors": "^1.4.0",
     "commander": "^8.3.0",
     "dotenv": "^11.0.0",
     "import-local": "^3.0.3",
     "minimist": "^1.2.5",
+    "npminstall": "^5.3.1",
     "npmlog": "^6.0.0",
     "path-exists": "^4.0.0",
     "root-check": "^1.0.0",
