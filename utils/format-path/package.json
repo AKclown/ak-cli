@@ -1,5 +1,5 @@
 {
-  "name": "@ak-cli/package",
+  "name": "@ak-cli/format-path",
   "version": "1.0.2",
   "description": "> TODO: description",
   "author": "AKclown <13413629530@139.com>",
@@ -19,11 +19,6 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/AKclown/ak-cli.git"
-  },
-  "dependencies": {
-    "@ak-clown/utils": "file:../../utils/utils",
-    "@ak-clown/format-path": "file:../../utils/format-path",
-    "pkg-dir": "^6.0.1"
   },
   "scripts": {
     "test": "echo \"Error: run tests from root\" && exit 1"
