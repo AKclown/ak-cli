@@ -5,6 +5,10 @@ const fs = require('fs');
 const inquirer = require('inquirer');
 const fse = require('fs-extra')
 
+// 项目/组件
+const TYPE_PROJECT = 'project';
+const TYPE_COMPONENT = 'component';
+
 class InitCommand extends Command {
     init() {
         this.projectName = this._argv[0] || '';
@@ -67,6 +71,8 @@ class InitCommand extends Command {
 
             }
         }
+
+        return this.getProjectInfo();
     }
 
     isCwdEmpty(localPath) {
@@ -76,6 +82,61 @@ class InitCommand extends Command {
         ))
         console.log('fileList: ', fileList);
         return !fileList || fileList.length <= 0;
+    }
+
+    getProjectInfo() {
+        const projectInfo = {};
+        // 1. 选择创建项目或组件
+        const { type } = await inquirer
+            .prompt([{
+                type: 'list',
+                name: 'type',
+                message: '请选择初始化类型',
+                default: TYPE_PROJECT,
+                choices: [{
+                    name: '项目',
+                    value: TYPE_PROJECT
+                }, {
+                    name: '组件',
+                    value: TYPE_COMPONENT
+                }]
+            }]);
+        log.verbose('type', type);
+
+        const o = await inquirer
+            .prompt([
+                {
+                    type: 'input',
+                    name: 'projectName',
+                    message: '请输入项目名称',
+                    default: '',
+                    validate: function (v) {
+                        return v;
+                    },
+                    filter: function (v) {
+                        return v;
+                    }
+                }, {
+                    type: 'input',
+                    name: 'projectVersion',
+                    message: '请输入项目版本号',
+                    default: '',
+                    validate: function (v) {
+                        return v === 'string';
+                    },
+                    filter: function (v) {
+                        return v;
+                    }
+                }
+            ])
+        // 2. 获取项目的基本信息
+        if (type === TYPE_PROJECT) {
+
+        } else if (type === TYPE_COMPONENT) {
+
+        }
+        // 返回项目的基本信息
+        return projectInfo
     }
 }
 
