@@ -10,7 +10,7 @@ const fse = require('fs-extra');
 
 class Package {
     constructor(options) {
-        if (!options || isObject(options)) {
+        if (!options || !isObject(options)) {
             throw new Error('Package类的options参数不能为空');
         }
         // package路径
@@ -18,7 +18,7 @@ class Package {
         // package存储路径
         this.storePath = options.storePath;
         // package的name
-        this.packageName = options.name;
+        this.packageName = options.packageName;
         // package的version
         this.packageVersion = options.version;
         // package的缓存目录前缀  @ak-cli/init 改为 @ak-cli_init
@@ -96,10 +96,11 @@ class Package {
     }
 
     // 获取入口文件路径  -  从main下的lib找到入口文件路径 
-    getRootFilePath() {
-        function _getRootFile(targetPath) {
+    async getRootFilePath() {
+        async function _getRootFile(targetPath) {
             // 1. 获取package.json所在目录 --- pkgDir获取当前路径的根目录
-            const dir = pkgDir(targetPath);
+            const dir = await pkgDir(targetPath);
+
             if (dir) {
                 // 2. 获取package.json
                 const pkgFile = require(path.resolve(dir, 'package.json'));
@@ -111,9 +112,9 @@ class Package {
             }
         }
         if (this.storePath) {
-            return _getRootFile(this.cacheFilePath);
+            return await _getRootFile(this.cacheFilePath);
         } else {
-            return _getRootFile(this.targetPath);
+            return await _getRootFile(this.targetPath);
         }
     }
 }

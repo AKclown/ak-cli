@@ -64,7 +64,7 @@ async function exec() {
             packageName,
             packageVersion
         });
-        const rootFile = pkg.getRootFilePath();
+        const rootFile =await pkg.getRootFilePath();
         // 获取到本地入口文件，将arguments传入进去
         if (rootFile) {
             //  执行方法文件，并且传递argument参数
