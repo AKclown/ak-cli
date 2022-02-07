@@ -14,6 +14,7 @@ const commander = require('commander');
 const init = require('@ak-clown/init');
 const exec = require('@ak-clown/exec');
 
+// 实例化commander对象实例
 const program = new commander.Command();
 
 async function core() {
@@ -41,6 +42,7 @@ function registerCommand() {
     .option('-d, --debug', '是否开启调试模式')
     .option('-tp, --targetPath <targetPath>', '是否指定本地调试文件路径', '')
 
+  // $ 注册init命令
   program
     .command('init [projectName]')
     .option('-f --force', '是否强制初始化项目')
@@ -77,6 +79,7 @@ function registerCommand() {
   // if (process.argv.length < 3) {
   //   program.outputHelp();
   // }
+  // $ args不存在前两个参数  -- node\ak-cli
   if (program.args && program.args.length < 1) {
     program.outputHelp();
   }
@@ -100,7 +103,7 @@ function checkNodeVersion() {
 
 function checkRoot() {
   const rootCheck = require('root-check');
-  // 尝试降级具有root权限的进程的权限，如果失败，则阻止访问权限
+  // $ 尝试降级具有root权限的进程的权限，如果失败，则阻止访问权限
   rootCheck();
 }
 
@@ -129,10 +132,11 @@ function checkArgs(args) {
 function checkEnv() {
   // dotenv环境变量检查，如果环境变量不存在需要设置默认值
   const dotenv = require('dotenv');
-  // userHome  => C:\Users\ak => C:\Users\ak\.env 根目录下的环境变量文件
+  // $ userHome  => C:\Users\ak => C:\Users\ak\.env 根目录下的环境变量文件
   const dotenvPath = path.resolve(userHome, '.env');
   if (pathExists(dotenvPath)) {
     config = dotenv.config({
+      // 自定义设置env路径
       path: dotenvPath
     })
   }

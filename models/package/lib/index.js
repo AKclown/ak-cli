@@ -45,10 +45,12 @@ class Package {
 
     // 判断当前package是否存在
     async exists() {
+        // $ 判断属于storeDir还是targetPath 。 
         if (this.storePath) {
             await this.prepare();
             return await pathExists(this.cacheFilePath);
         } else {
+            // targetPath 直接判断当前路径是否存在
             return await pathExists(this.targetPath);
         }
     }
@@ -57,7 +59,7 @@ class Package {
     install() {
         npminstall({
             root: this.targetPath,
-            storePath: this.storePath,
+            storeDir: this.storePath,
             registry: getDefaultRegistry(),
             pkgs: [{
                 name: this.packageName,
@@ -71,7 +73,7 @@ class Package {
         await this.prepare();
         // 1. 获取到最新的npm模块版本号
         const lastPackageVersion = await getNpmLatestVersion(this.packageName);
-        // 2. 查询最新版本号对应的路径是否存在
+        // 2. 查询最新版本号对应的路径是否存在 （判断当前包是否存在）
         const lastFilePath = this.getSpecificCacheFilePath(lastPackageVersion);
         // 3. 如果不存在, 则直接安装最新版本
         if (!pathExists(lastFilePath)) {
@@ -93,10 +95,10 @@ class Package {
         @${this.packageName}`);
     }
 
-    // 获取入口文件路径
+    // 获取入口文件路径  -  从main下的lib找到入口文件路径 
     getRootFilePath() {
         function _getRootFile(targetPath) {
-            // 1. 获取package.json所在目录
+            // 1. 获取package.json所在目录 --- pkgDir获取当前路径的根目录
             const dir = pkgDir(targetPath);
             if (dir) {
                 // 2. 获取package.json
