@@ -1,5 +1,5 @@
 {
-  "name": "@ak-clown/init",
+  "name": "@ak-clown/request",
   "version": "1.0.2",
   "description": "> TODO: description",
   "author": "AKclown <13413629530@139.com>",
@@ -27,10 +27,6 @@
     "url": "https://github.com/AKclown/ak-cli/issues"
   },
   "dependencies": {
-    "@ak-clown/command": "file:../../models/command",
-    "@ak-clown/log": "file:../../utils/log",
-    "@ak-clown/request": "file:../../utils/request",
-    "inquirer": "^8.2.0",
-    "semver": "^7.3.5"
+    "axios": "^0.25.0"
   }
 }

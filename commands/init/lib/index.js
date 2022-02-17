@@ -3,13 +3,21 @@ const log = require('@ak-clown/log');
 const fs = require('fs');
 const inquirer = require('inquirer');
 const fse = require('fs-extra');
-const semver = require('semver')
+const semver = require('semver');
+const getProjectTemplate = require('./getProjectTemplate.js')
 
 // 项目/组件
 const TYPE_PROJECT = 'project';
 const TYPE_COMPONENT = 'component';
 
 class InitCommand extends Command {
+
+    // 模板数据
+    template;
+
+    // 项目信息
+    projectInfo;
+
     init() {
         this.projectName = this._argv[0] || '';
         this.force = !!this._cmd.force;
@@ -29,6 +37,7 @@ class InitCommand extends Command {
             if (projectInfo) {
                 //  2.下载模板
                 log.verbose('projectInfo', projectInfo);
+                this.projectInfo = projectInfo;
                 this.downloadTemplate();
                 // 3. 安装模板
             }
@@ -41,7 +50,7 @@ class InitCommand extends Command {
         /**
          * 1.通过项目模板API获取项目模板信息
          * 2.通过egg.js搭建一套后台系统
-         * 3.通过npm存储项目模板
+         * 3.通过npm存储项目模板(vue-cli/vue-element-admin)
          * 4.将项目模板储存到mongodb数据库中
          * 5.通过egg.js获取mongodb中的数据并且通过API返回
          */
@@ -54,6 +63,14 @@ class InitCommand extends Command {
          * 3. 选择创建项目或组件
          * 4. 获取项目基本信息
          */
+
+        // $ 判断项目模板是否存在
+        const template = await getProjectTemplate();
+        if (!template || template.length === 0) {
+            throw new Error('项目模板不存在');
+        }
+        this.template = template;
+
         const localPath = process.cwd();
         if (!this.isCwdEmpty(localPath)) {
             // 1.1 询问是否继续创建
@@ -97,7 +114,6 @@ class InitCommand extends Command {
         fileList = fileList.filter(file => (
             !file.startsWith('.') && !['node_modules'].includes(file)
         ))
-        console.log('fileList: ', fileList);
         return !fileList || fileList.length <= 0;
     }
 
@@ -161,6 +177,11 @@ class InitCommand extends Command {
                             return v
                         }
                     }
+                }, {
+                    type: 'list',
+                    name: 'projectTemplate',
+                    message: '请选择项目模板',
+                    choices: this.createTemplateChoice()
                 }
             ]);
         // 2. 获取项目的基本信息
@@ -174,7 +195,17 @@ class InitCommand extends Command {
         // 返回项目的基本信息
         return projectInfo
     }
+
+    createTemplateChoice() {
+        return this.template.map(item => ({
+            value: item.npmName,
+            name: item.name
+        }))
+
+    }
 }
+
+
 
 // todo 
 function init(args) {
