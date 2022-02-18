@@ -5,6 +5,9 @@ const inquirer = require('inquirer');
 const fse = require('fs-extra');
 const semver = require('semver');
 const getProjectTemplate = require('./getProjectTemplate.js')
+const path = require('path');
+const userHome = require('userhome')();
+const Package = require('@ak-cli/package');
 
 // 项目/组件
 const TYPE_PROJECT = 'project';
@@ -46,14 +49,39 @@ class InitCommand extends Command {
         }
     }
 
+    /**
+      * 1.通过项目模板API获取项目模板信息
+      * 2.通过egg.js搭建一套后台系统
+      * 3.通过npm存储项目模板(vue-cli/vue-element-admin)
+      * 4.将项目模板储存到mongodb数据库中
+      * 5.通过egg.js获取mongodb中的数据并且通过API返回
+      */
     downloadTemplate() {
-        /**
-         * 1.通过项目模板API获取项目模板信息
-         * 2.通过egg.js搭建一套后台系统
-         * 3.通过npm存储项目模板(vue-cli/vue-element-admin)
-         * 4.将项目模板储存到mongodb数据库中
-         * 5.通过egg.js获取mongodb中的数据并且通过API返回
-         */
+        // 获取到项目模板信息
+        const { projectTemplate } = this.projectInfo;
+        const templateInfo = this.template.find(item => item.npmName === projectTemplate);
+
+        // 安装所在路径
+        const targetPath = path.resolve(userHome, '.ak-cli', 'template');
+        const storePath = path.resolve(targetPath, 'node_modules');
+        // 获取到包名和版本信息
+        const { npmName, version } = templateInfo;
+
+        const templateNpm = new Package({
+            targetPath,
+            storePath,
+            packageName: npmName,
+            packageVersion: version
+        })
+
+        // 判断是否存在，存在就更新，不存在就安装
+        if (! await templateNpm.exists()) {
+            await templateNpm.install();
+        } else {
+            await templateNpm.update();
+        }
+
+        console.log('templateInfo: ', templateInfo);
     }
 
     async prepare() {
@@ -118,6 +146,7 @@ class InitCommand extends Command {
     }
 
     async getProjectInfo() {
+        let projectInfo = {};
         // 1. 选择创建项目或组件
         const { type } = await inquirer
             .prompt([{
@@ -135,7 +164,7 @@ class InitCommand extends Command {
             }]);
         log.verbose('type', type);
 
-        const { projectName, projectVersion } = await inquirer
+        const templateInfo = await inquirer
             .prompt([
                 {
                     type: 'input',
@@ -184,14 +213,14 @@ class InitCommand extends Command {
                     choices: this.createTemplateChoice()
                 }
             ]);
+
+        projectInfo = { type, ...templateInfo };
         // 2. 获取项目的基本信息
         if (type === TYPE_PROJECT) {
 
         } else if (type === TYPE_COMPONENT) {
 
         }
-
-        const projectInfo = { type, projectName, projectVersion };
         // 返回项目的基本信息
         return projectInfo
     }
@@ -201,7 +230,6 @@ class InitCommand extends Command {
             value: item.npmName,
             name: item.name
         }))
-
     }
 }
 

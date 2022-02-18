@@ -28,6 +28,7 @@
   },
   "dependencies": {
     "@ak-clown/command": "file:../../models/command",
+    "@ak-cli/package": "file:../../models/package",
     "@ak-clown/log": "file:../../utils/log",
     "@ak-clown/request": "file:../../utils/request",
     "inquirer": "^8.2.0",

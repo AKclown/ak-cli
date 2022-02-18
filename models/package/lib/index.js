@@ -27,7 +27,7 @@ class Package {
 
     // 准备工作
     async prepare() {
-        // $ 新建缓存目录
+        // $ 新建缓存目录 - 安装包的位置
         if (this.storePath && !pathExists(this.storePath)) {
             fse.mkdirSync(this.storePath);
         }
