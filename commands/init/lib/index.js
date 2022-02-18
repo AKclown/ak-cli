@@ -8,18 +8,26 @@ const getProjectTemplate = require('./getProjectTemplate.js')
 const path = require('path');
 const userHome = require('userhome')();
 const Package = require('@ak-cli/package');
+const { spinnerStart, sleep } = require('@ak-clown/utils');
 
 // 项目/组件
 const TYPE_PROJECT = 'project';
 const TYPE_COMPONENT = 'component';
 
+// 组件类型
+const TEMPLATE_TYPE_NORMAL = 'normal';
+const TEMPLATE_TYPE_CUSTOM = 'custom';
+
 class InitCommand extends Command {
 
     // 模板数据
     template;
-
     // 项目信息
     projectInfo;
+    // 模板信息
+    templateInfo;
+    // 实例
+    templateNpm;
 
     init() {
         this.projectName = this._argv[0] || '';
@@ -41,12 +49,55 @@ class InitCommand extends Command {
                 //  2.下载模板
                 log.verbose('projectInfo', projectInfo);
                 this.projectInfo = projectInfo;
-                this.downloadTemplate();
+                await this.downloadTemplate();
                 // 3. 安装模板
+                await this.installTemplate()
             }
         } catch (error) {
             log.error(error.message);
         }
+    }
+
+    async installTemplate() {
+        if (this.templateInfo) {
+            if (!this.templateInfo.type) {
+                this.templateInfo.type = TEMPLATE_TYPE_NORMAL;
+            }
+            if (this.templateInfo.type === TEMPLATE_TYPE_NORMAL) {
+                // 标准安装
+                await this.installNormalTemplate();
+            } else if (this.templateInfo.type === TEMPLATE_TYPE_CUSTOM) {
+                // 自定义安装
+                await this.installCustomTemplate();
+            } else {
+                throw new Error('无法识别项目模板类型!');
+            }
+        } else {
+            throw new Error('项目模板信息不存在!');
+        }
+    }
+
+    async installNormalTemplate() {
+        log.verbose('安装标准模板');
+        // $ 拷贝模块代码至当前目录
+        const spinner = spinnerStart('正在安装模板...');
+        await sleep();
+        try {
+            // C:\Users\ak\.ak-cli\template\node_modules\_ak-cli-template-vue2@1.0.0@ak-cli-template-vue2\template
+            const templatePath = path.resolve(this.templateNpm.cacheFilePath, 'template');
+            const targetPath = process.cwd();
+            fse.ensureDirSync(templatePath);
+            fse.ensureDirSync(targetPath);
+            fse.copySync(templatePath, targetPath);
+        } catch (error) {
+            throw error;
+        } finally {
+            spinner.stop(true);
+        }
+    }
+
+    async installCustomTemplate() {
+
     }
 
     /**
@@ -56,7 +107,7 @@ class InitCommand extends Command {
       * 4.将项目模板储存到mongodb数据库中
       * 5.通过egg.js获取mongodb中的数据并且通过API返回
       */
-    downloadTemplate() {
+    async downloadTemplate() {
         // 获取到项目模板信息
         const { projectTemplate } = this.projectInfo;
         const templateInfo = this.template.find(item => item.npmName === projectTemplate);
@@ -66,22 +117,43 @@ class InitCommand extends Command {
         const storePath = path.resolve(targetPath, 'node_modules');
         // 获取到包名和版本信息
         const { npmName, version } = templateInfo;
-
+        this.templateInfo = templateInfo;
         const templateNpm = new Package({
             targetPath,
             storePath,
+            version,
             packageName: npmName,
-            packageVersion: version
         })
-
         // 判断是否存在，存在就更新，不存在就安装
         if (! await templateNpm.exists()) {
-            await templateNpm.install();
+            const spinner = spinnerStart('正在下载模板...');
+            await sleep();
+            try {
+                await templateNpm.install();
+            } catch (error) {
+                throw error;
+            } finally {
+                spinner.stop(true);
+                if (await templateNpm.exists()) {
+                    log.success('下载模板成功');
+                    this.templateNpm = templateNpm;
+                }
+            }
         } else {
-            await templateNpm.update();
+            const spinner = spinnerStart('正在更新模板...');
+            await sleep();
+            try {
+                await templateNpm.update();
+            } catch (error) {
+                throw error;
+            } finally {
+                spinner.stop(true);
+                if (await templateNpm.exists()) {
+                    log.success('更新模板成功');
+                    this.templateNpm = templateNpm;
+                }
+            }
         }
-
-        console.log('templateInfo: ', templateInfo);
     }
 
     async prepare() {
