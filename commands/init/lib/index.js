@@ -8,7 +8,7 @@ const getProjectTemplate = require('./getProjectTemplate.js')
 const path = require('path');
 const userHome = require('userhome')();
 const Package = require('@ak-cli/package');
-const { spinnerStart, sleep } = require('@ak-clown/utils');
+const { spinnerStart, sleep, execAsync } = require('@ak-clown/utils');
 
 // 项目/组件
 const TYPE_PROJECT = 'project';
@@ -93,6 +93,37 @@ class InitCommand extends Command {
             throw error;
         } finally {
             spinner.stop(true);
+            log.verbose('模板安装成功');
+        }
+
+        // 依赖安装
+        const { installCommand, startCommand } = this.templateInfo;
+        // npm install
+        if (installCommand) {
+            const installCmd = installCommand.split(' ');
+            const cmd = installCmd[0];
+            const args = installCmd.slice(1);
+            const installRet = await execAsync(cmd, args, {
+                stdio: 'inherit',
+                cwd: process.cwd()
+            });
+            if (installRet !== 0) {
+                throw new Error('依赖安装过程中失败！')
+            }
+        }
+        // 启动命令执行
+        if (startCommand) {
+            const startCmd = startCommand.split(' ');
+            const cmd = startCmd[0];
+            const args = startCmd.slice(1);
+            const startRet = await execAsync(cmd, args, {
+                stdio: 'inherit',
+                cwd: process.cwd()
+            });
+
+            if (startRet !== 0) {
+                throw new Error('项目启动失败！')
+            }
         }
     }
 

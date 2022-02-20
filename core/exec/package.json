@@ -25,7 +25,8 @@
   },
   "dependencies":{
     "@ak-clown/package": "file:../../models/package",
-    "@ak-clown/log": "file:../../utils/log"
+    "@ak-clown/log": "file:../../utils/log",
+    "@ak-clown/utils": "file:../../utils/utils"
   },
   "bugs": {
     "url": "https://github.com/AKclown/ak-cli/issues"
