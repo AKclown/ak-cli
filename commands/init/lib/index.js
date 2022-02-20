@@ -18,6 +18,9 @@ const TYPE_COMPONENT = 'component';
 const TEMPLATE_TYPE_NORMAL = 'normal';
 const TEMPLATE_TYPE_CUSTOM = 'custom';
 
+// 命令白名单
+const WHITE_COMMAND = ['npm', 'cnpm'];
+
 class InitCommand extends Command {
 
     // 模板数据
@@ -96,39 +99,43 @@ class InitCommand extends Command {
             log.verbose('模板安装成功');
         }
 
-        // 依赖安装
         const { installCommand, startCommand } = this.templateInfo;
-        // npm install
-        if (installCommand) {
-            const installCmd = installCommand.split(' ');
-            const cmd = installCmd[0];
-            const args = installCmd.slice(1);
-            const installRet = await execAsync(cmd, args, {
-                stdio: 'inherit',
-                cwd: process.cwd()
-            });
-            if (installRet !== 0) {
-                throw new Error('依赖安装过程中失败！')
-            }
-        }
-        // 启动命令执行
-        if (startCommand) {
-            const startCmd = startCommand.split(' ');
-            const cmd = startCmd[0];
-            const args = startCmd.slice(1);
-            const startRet = await execAsync(cmd, args, {
-                stdio: 'inherit',
-                cwd: process.cwd()
-            });
 
-            if (startRet !== 0) {
-                throw new Error('项目启动失败！')
-            }
-        }
+        // 依赖安装
+        await this.execCommand(installCommand, '依赖安装过程中失败！');
+        // 启动命令执行
+        await this.execCommand(startCommand, '项目启动失败！');
     }
 
     async installCustomTemplate() {
 
+    }
+
+    async execCommand(command, errMsg) {
+        let ret;
+        if (command) {
+            const cmdArray = command.split(' ');
+            const cmd = this.checkCommand(cmdArray[0]);
+            if (!cmd) {
+                throw new Error(`命令不存在！命令:${command}`)
+            }
+            const args = cmdArray.slice(1);
+            ret = await execAsync(cmd, args, {
+                stdio: 'inherit',
+                cwd: process.cwd()
+            });
+            if (ret !== 0) {
+                throw new Error(errMsg)
+            }
+        }
+        return ret
+    }
+
+    checkCommand(cmd) {
+        if (WHITE_COMMAND.includes(cmd)) {
+            return cmd;
+        }
+        return null;
     }
 
     /**
