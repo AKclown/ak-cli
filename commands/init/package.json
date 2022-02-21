@@ -27,12 +27,14 @@
     "url": "https://github.com/AKclown/ak-cli/issues"
   },
   "dependencies": {
-    "@ak-clown/command": "file:../../models/command",
     "@ak-cli/package": "file:../../models/package",
+    "@ak-clown/command": "file:../../models/command",
     "@ak-clown/log": "file:../../utils/log",
-    "@ak-clown/utils": "file:../../utils/utils",
     "@ak-clown/request": "file:../../utils/request",
+    "@ak-clown/utils": "file:../../utils/utils",
+    "ejs": "^3.1.6",
     "inquirer": "^8.2.0",
+    "kebab-case": "^1.0.1",
     "semver": "^7.3.5"
   }
 }

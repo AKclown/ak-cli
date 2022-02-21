@@ -86,8 +86,10 @@ class Package {
                     version: lastPackageVersion
                 }]
             })
+            this.packageVersion = lastPackageVersion;
+        } else {
+            this.packageVersion = lastPackageVersion;
         }
-        this.packageVersion = lastPackageVersion;
     }
 
     getSpecificCacheFilePath(packageVersion) {

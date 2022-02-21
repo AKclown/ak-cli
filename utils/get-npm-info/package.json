@@ -29,7 +29,7 @@
   },
   "dependencies": {
     "axios": "^0.24.0",
-    "semver": "^7.3.5",
+    "semver": "^5.7.1",
     "url-join": "^4.0.1"
   },
   "gitHead": "a97c4362c48738ad3ba3519cad470f552ff69ffb"

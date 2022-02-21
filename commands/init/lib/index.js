@@ -8,6 +8,8 @@ const getProjectTemplate = require('./getProjectTemplate.js')
 const path = require('path');
 const userHome = require('userhome')();
 const Package = require('@ak-cli/package');
+const ejs = require('ejs');
+const glob = require('glob');
 const { spinnerStart, sleep, execAsync } = require('@ak-clown/utils');
 
 // 项目/组件
@@ -58,6 +60,9 @@ class InitCommand extends Command {
             }
         } catch (error) {
             log.error(error.message);
+            if (process.env.LOG_LEVEL === 'verbose') {
+                console.log(error);
+            }
         }
     }
 
@@ -80,6 +85,44 @@ class InitCommand extends Command {
         }
     }
 
+    // 进行ejs模板渲染
+    async ejsRender(options) {
+        const dir = process.cwd();
+        // this.projectInfo在ejs无法直接获取到
+        const projectInfo = this.projectInfo;
+        return new Promise((resolve, reject) => {
+            glob('**', {
+                cwd: process.cwd(),
+                // 忽略文件
+                ignore: options.ignore || '',
+                // 目录文件排除
+                nodir: true
+            }, (err, files) => {
+                if (err) {
+                    reject(err)
+                }
+                Promise.all(files.map(file => {
+                    const filePath = path.join(dir, file);
+                    return new Promise((resolve1, reject1) => {
+                        // ejs渲染
+                        ejs.renderFile(filePath, projectInfo, {}, (err, result) => {
+                            if (err) {
+                                reject1(err);
+                            } else {
+                                fse.writeFileSync(filePath, result);
+                                resolve1(result);
+                            }
+                        })
+                    }).then(() => {
+                        resolve()
+                    }).catch(() => {
+                        reject();
+                    })
+                }))
+            })
+        })
+    }
+
     async installNormalTemplate() {
         log.verbose('安装标准模板');
         // $ 拷贝模块代码至当前目录
@@ -88,6 +131,7 @@ class InitCommand extends Command {
         try {
             // C:\Users\ak\.ak-cli\template\node_modules\_ak-cli-template-vue2@1.0.0@ak-cli-template-vue2\template
             const templatePath = path.resolve(this.templateNpm.cacheFilePath, 'template');
+            console.log('templatePath: ', templatePath);
             const targetPath = process.cwd();
             fse.ensureDirSync(templatePath);
             fse.ensureDirSync(targetPath);
@@ -99,11 +143,12 @@ class InitCommand extends Command {
             log.verbose('模板安装成功');
         }
 
+        const ignore = ['node_modules/**', 'public/**'];
+        await this.ejsRender({ ignore })
         const { installCommand, startCommand } = this.templateInfo;
-
-        // 依赖安装
+        // // 依赖安装
         await this.execCommand(installCommand, '依赖安装过程中失败！');
-        // 启动命令执行
+        // // 启动命令执行
         await this.execCommand(startCommand, '项目启动失败！');
     }
 
@@ -161,7 +206,8 @@ class InitCommand extends Command {
             storePath,
             version,
             packageName: npmName,
-        })
+        });
+
         // 判断是否存在，存在就更新，不存在就安装
         if (! await templateNpm.exists()) {
             const spinner = spinnerStart('正在下载模板...');
@@ -330,6 +376,15 @@ class InitCommand extends Command {
 
         } else if (type === TYPE_COMPONENT) {
 
+        }
+
+        // 生成className
+        if (projectInfo.projectName) {
+            projectInfo.name = projectInfo.projectName;
+            projectInfo.className = require("kebab-case")(projectInfo.projectName).replace(/-/, '');
+        }
+        if (projectInfo.projectVersion) {
+            projectInfo.version = projectInfo.projectVersion;
         }
         // 返回项目的基本信息
         return projectInfo
