@@ -143,8 +143,10 @@ class InitCommand extends Command {
             log.verbose('模板安装成功');
         }
 
-        const ignore = ['node_modules/**', 'public/**'];
-        await this.ejsRender({ ignore })
+        // $ 动态获取mongodb配置得ignore
+        const templateIgnore = this.templateInfo.ignore || []
+        const ignore = ['node_modules/**', ...templateIgnore];
+        await this.ejsRender({ ignore });
         const { installCommand, startCommand } = this.templateInfo;
         // // 依赖安装
         await this.execCommand(installCommand, '依赖安装过程中失败！');
@@ -328,6 +330,9 @@ class InitCommand extends Command {
                 }]
             }]);
         log.verbose('type', type);
+
+        // $ 根据类型过滤template
+        this.template = this.template.filter(template => template.tag.includes(type));
 
         const projectPrompt = [];
         const projectNamePrompt = {
