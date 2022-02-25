@@ -3,7 +3,7 @@
 const Package = require('@ak-clown/package');
 const log = require('@ak-clown/log');
 const path = require('path');
-const { exec:spawn } = require('@ak-clown/utils')
+const { exec: spawn } = require('@ak-clown/utils')
 const SETTINGS = {
     init: '@ak-clown/init'
 }
@@ -67,8 +67,14 @@ async function exec() {
         const rootFile = await pkg.getRootFilePath();
         // 获取到本地入口文件，将arguments传入进去
         if (rootFile) {
-            //  执行方法文件，并且传递argument参数
-            require(rootFile).apply(null, arguments);
+            try {
+                //  执行方法文件，并且传递argument参数
+                require(rootFile)(Array.from(arguments));
+                // $ 不知道为啥这么调用arguments参数会丢失
+                // require(rootFile).apply(null, Array.from(arguments));
+            } catch (error) {
+                log.error(error.message);
+            }
         }
     }
 }

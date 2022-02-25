@@ -398,11 +398,9 @@ class InitCommand extends Command {
     }
 }
 
-
-
-// todo 
 function init(args) {
-    return new InitCommand(args).exec();
+    return new InitCommand(args);
 }
 
 module.exports = init;
+module.exports.InitCommand = InitCommand
