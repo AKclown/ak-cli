@@ -302,7 +302,16 @@ class InitCommand extends Command {
     }
 
     async getProjectInfo() {
+        function isValidName(v) {
+            return /^[a-zA-Z]+([-][a-zA-Z][a-zA-Z0-9]*|[_][a-zA-Z][a-zA-Z0-9]|[a-zA-Z0-9]*)*$/.test(v);
+        }
         let projectInfo = {};
+        let isProjectNameValid = false;
+        if (isValidName(this.projectName)) {
+            isProjectNameValid = true;
+            projectInfo.projectName = this.projectName;
+        }
+
         // 1. 选择创建项目或组件
         const { type } = await inquirer
             .prompt([{
@@ -320,57 +329,60 @@ class InitCommand extends Command {
             }]);
         log.verbose('type', type);
 
-        const templateInfo = await inquirer
-            .prompt([
-                {
-                    type: 'input',
-                    name: 'projectName',
-                    message: '请输入项目名称',
-                    default: '',
-                    validate: function (v) {
-                        const done = this.async();
-                        /**
-                         * 1. 首字母必须为英文字符
-                         * 2. 尾字符必须为英文或数字，不能为字符
-                         * 3. 字符仅允许“-_”
-                         */
-                        setTimeout(function () {
-                            if (!/^[a-zA-Z]+([-][a-zA-Z][a-zA-Z0-9]*|[_][a-zA-Z][a-zA-Z0-9]|[a-zA-Z0-9]*)*$/.test(v)) {
-                                done('请输入合法的项目名称');
-                                return;
-                            }
-                            // Pass the return value in the done callback
-                            done(null, true);
-                        }, 0);
-                    },
-                    filter: function (v) {
-                        return v;
+        const projectPrompt = [];
+        const projectNamePrompt = {
+            type: 'input',
+            name: 'projectName',
+            message: '请输入项目名称',
+            default: '',
+            validate: function (v) {
+                const done = this.async();
+                /**
+                 * 1. 首字母必须为英文字符
+                 * 2. 尾字符必须为英文或数字，不能为字符
+                 * 3. 字符仅允许“-_”
+                 */
+                setTimeout(function () {
+                    if (!isValidName(v)) {
+                        done('请输入合法的项目名称');
+                        return;
                     }
-                }, {
-                    type: 'input',
-                    name: 'projectVersion',
-                    message: '请输入项目版本号',
-                    default: '1.0.0',
-                    validate: function (v) {
-                        return !!semver.valid(v);
-                    },
-                    filter: function (v) {
-                        if (!!semver.valid(v)) {
-                            // 能够将V1.0.0转为 1.0.0
-                            return semver.valid(v);
-                        } else {
-                            return v
-                        }
-                    }
-                }, {
-                    type: 'list',
-                    name: 'projectTemplate',
-                    message: '请选择项目模板',
-                    choices: this.createTemplateChoice()
+                    // Pass the return value in the done callback
+                    done(null, true);
+                }, 0);
+            },
+            filter: function (v) {
+                return v;
+            }
+        }
+        if (!isProjectNameValid) {
+            projectPrompt.push(projectNamePrompt);
+        }
+        projectPrompt.push({
+            type: 'input',
+            name: 'projectVersion',
+            message: '请输入项目版本号',
+            default: '1.0.0',
+            validate: function (v) {
+                return !!semver.valid(v);
+            },
+            filter: function (v) {
+                if (!!semver.valid(v)) {
+                    // 能够将V1.0.0转为 1.0.0
+                    return semver.valid(v);
+                } else {
+                    return v
                 }
-            ]);
+            }
+        }, {
+            type: 'list',
+            name: 'projectTemplate',
+            message: '请选择项目模板',
+            choices: this.createTemplateChoice()
+        })
+        const templateInfo = await inquirer.prompt(projectPrompt);
 
-        projectInfo = { type, ...templateInfo };
+        projectInfo = { ...projectInfo, type, ...templateInfo };
         // 2. 获取项目的基本信息
         if (type === TYPE_PROJECT) {
 
