@@ -131,7 +131,6 @@ class InitCommand extends Command {
         try {
             // C:\Users\ak\.ak-cli\template\node_modules\_ak-cli-template-vue2@1.0.0@ak-cli-template-vue2\template
             const templatePath = path.resolve(this.templateNpm.cacheFilePath, 'template');
-            console.log('templatePath: ', templatePath);
             const targetPath = process.cwd();
             fse.ensureDirSync(templatePath);
             fse.ensureDirSync(targetPath);
@@ -333,12 +332,13 @@ class InitCommand extends Command {
 
         // $ 根据类型过滤template
         this.template = this.template.filter(template => template.tag.includes(type));
+        const title = type === TYPE_PROJECT ? '项目' : '组件';
 
         const projectPrompt = [];
         const projectNamePrompt = {
             type: 'input',
             name: 'projectName',
-            message: '请输入项目名称',
+            message: `请输入${title}名称`,
             default: '',
             validate: function (v) {
                 const done = this.async();
@@ -349,7 +349,7 @@ class InitCommand extends Command {
                  */
                 setTimeout(function () {
                     if (!isValidName(v)) {
-                        done('请输入合法的项目名称');
+                        done(`请输入合法的${title}名称`);
                         return;
                     }
                     // Pass the return value in the done callback
@@ -366,7 +366,7 @@ class InitCommand extends Command {
         projectPrompt.push({
             type: 'input',
             name: 'projectVersion',
-            message: '请输入项目版本号',
+            message: `请输入${title}版本号`,
             default: '1.0.0',
             validate: function (v) {
                 return !!semver.valid(v);
@@ -382,18 +382,39 @@ class InitCommand extends Command {
         }, {
             type: 'list',
             name: 'projectTemplate',
-            message: '请选择项目模板',
+            message: `请选择${title}模板`,
             choices: this.createTemplateChoice()
         })
-        const templateInfo = await inquirer.prompt(projectPrompt);
 
-        projectInfo = { ...projectInfo, type, ...templateInfo };
         // 2. 获取项目的基本信息
         if (type === TYPE_PROJECT) {
-
         } else if (type === TYPE_COMPONENT) {
-
+            const descriptionPrompt = {
+                type: 'input',
+                name: 'componentDescription',
+                message: '请输入组件描述信息',
+                default: '',
+                validate: function (v) {
+                    const done = this.async();
+                    /**
+                     * 1. 首字母必须为英文字符
+                     * 2. 尾字符必须为英文或数字，不能为字符
+                     * 3. 字符仅允许“-_”
+                     */
+                    setTimeout(function () {
+                        if (!isValidName(v)) {
+                            done('请输入合法的组件描述');
+                            return;
+                        }
+                        // Pass the return value in the done callback
+                        done(null, true);
+                    }, 0);
+                },
+            }
+            projectPrompt.push(descriptionPrompt);
         }
+        const templateInfo = await inquirer.prompt(projectPrompt);
+        projectInfo = { ...projectInfo, type, ...templateInfo };
 
         // 生成className
         if (projectInfo.projectName) {
@@ -403,6 +424,10 @@ class InitCommand extends Command {
         if (projectInfo.projectVersion) {
             projectInfo.version = projectInfo.projectVersion;
         }
+        if (projectInfo.componentDescription) {
+            projectInfo.description = projectInfo.componentDescription;
+        }
+
         // 返回项目的基本信息
         return projectInfo
     }

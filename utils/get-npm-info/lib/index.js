@@ -51,7 +51,7 @@ async function getNpmLatestVersion(npmName, registry) {
     const versions = await getNpmVersions(npmName, registry);
     // TODO semver不生效
     if (versions) {
-        return versions.sort((a, b) => semver.gt(a, b))[2]
+        return versions.sort((a, b) => semver.gt(a, b))[versions.length - 1]
     }
     return null;
 }

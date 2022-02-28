@@ -18,6 +18,9 @@ class Command {
             let chain = Promise.resolve();
             chain = chain.then(() => { this.checkNodeVersion() });
             chain = chain.then(() => this.initArgs());
+            // 
+            chain = chain.then(() => this.init());
+            // 
             chain = chain.then(() => this.exec());
             chain.catch(err => { console.log(err.message) })
         })
