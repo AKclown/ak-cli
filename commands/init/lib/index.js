@@ -154,7 +154,25 @@ class InitCommand extends Command {
     }
 
     async installCustomTemplate() {
-
+        if (await this.templateNpm.exists()) {
+            const rootFile =await this.templateNpm.getRootFilePath();
+            if (fs.existsSync(rootFile)) {
+                log.verbose('开始执行自动安装模板');
+                const templatePath = path.resolve(this.templateNpm.cacheFilePath, 'template');
+                const options = {
+                    templateInfo: this.templateInfo,
+                    projectInfo: this.projectInfo,
+                    sourcePath: templatePath,
+                    target: process.cwd()
+                }
+                const code = `require('${rootFile}')(${JSON.stringify(options)})`;
+                log.verbose('code', code);
+                await execAsync('node', ['-e', code], { stdio: 'inherit', cwd: process.cwd() });
+                log.success('自定义模板安装成功');
+            }
+        } else {
+            throw new Error('自定义模板入口文件不存在');
+        }
     }
 
     async execCommand(command, errMsg) {
@@ -208,7 +226,6 @@ class InitCommand extends Command {
             version,
             packageName: npmName,
         });
-
         // 判断是否存在，存在就更新，不存在就安装
         if (! await templateNpm.exists()) {
             const spinner = spinnerStart('正在下载模板...');

@@ -56,8 +56,8 @@ class Package {
     }
 
     // 安装package
-    install() {
-        npminstall({
+    async install() {
+        await npminstall({
             root: this.targetPath,
             storeDir: this.storePath,
             registry: getDefaultRegistry(),
