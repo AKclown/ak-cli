@@ -3,11 +3,11 @@
 const Package = require('@ak-clown/package');
 const log = require('@ak-clown/log');
 const path = require('path');
-const { exec: spawn } = require('@ak-clown/utils')
+const { exec: spawn } = require('@ak-clown/utils');
+
 const SETTINGS = {
     init: '@ak-clown/init'
 }
-
 // 缓存默认目录
 const CACHE_DIR = 'dependencies';
 
@@ -68,10 +68,35 @@ async function exec() {
         // 获取到本地入口文件，将arguments传入进去
         if (rootFile) {
             try {
-                //  执行方法文件，并且传递argument参数
-                require(rootFile)(Array.from(arguments));
+                // $ 在当前进程中调用
+                // 执行方法文件，并且传递argument参数
+                // require(rootFile)(Array.from(arguments));
                 // $ 不知道为啥这么调用arguments参数会丢失
                 // require(rootFile).apply(null, Array.from(arguments));
+
+                // $ 在Node子进程中调用
+                const args = Array.from(arguments);
+                const cmd = args[args.length - 1];
+                const o = Object.create(null);
+                // 过滤掉集成参数和私有参数、以及parent
+                Object.keys(cmd).forEach(key => {
+                    if (cmd.hasOwnProperty(key) && !key.startsWith('_') && key !== 'parent') {
+                        o[key] = cmd[key];
+                    }
+                });
+                args[args.length - 1] = o;
+                const code = `require('${rootFile}').call(null,${JSON.stringify(args)})`;
+                const child = spawn('node', ['-e', code], {
+                    cwd: process.cwd(),
+                    stdio: 'inherit'
+                });
+                child.on('error', e => {
+                    log.error(e.message);
+                    process.exit(1);
+                });
+                child.on('exit', e => {
+                    log.verbose('命令执行成功'+e);
+                });
             } catch (error) {
                 log.error(error.message);
             }

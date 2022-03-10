@@ -155,7 +155,7 @@ class InitCommand extends Command {
 
     async installCustomTemplate() {
         if (await this.templateNpm.exists()) {
-            const rootFile =await this.templateNpm.getRootFilePath();
+            const rootFile = await this.templateNpm.getRootFilePath();
             if (fs.existsSync(rootFile)) {
                 log.verbose('开始执行自动安装模板');
                 const templatePath = path.resolve(this.templateNpm.cacheFilePath, 'template');
