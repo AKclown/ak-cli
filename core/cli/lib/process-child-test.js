@@ -1,14 +1,12 @@
 const { spawn } = require('child_process');
-const ls = spawn('ls', ['-lh', '/usr']);
+const { cp } = require('fs');
+const path = require('path');
 
-ls.stdout.on('data', (data) => {
-  console.log(`stdout: ${data}`);
-});
+cp.exec(path.resolve(__dirname, 'test.shell'), {
+  cwd: path.resolve('..')
+}, function (err, stout, stderr) {
+  console.log(err);
+  console.log(stout);
+  console.log(stderr);
+})
 
-ls.stderr.on('data', (data) => {
-  console.error(`stderr: ${data}`);
-});
-
-ls.on('close', (code) => {
-  console.log(`child process exited with code ${code}`);
-});
