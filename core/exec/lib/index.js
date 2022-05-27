@@ -7,6 +7,7 @@ const { exec: spawn } = require('@ak-clown/utils');
 
 const SETTINGS = {
   init: '@ak-clown/init',
+  publish: '@ak-clown/publish',
 };
 // 缓存默认目录
 const CACHE_DIR = 'dependencies';

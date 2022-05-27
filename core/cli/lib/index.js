@@ -47,6 +47,9 @@ function registerCommand() {
     .option('-f --force', '是否强制初始化项目')
     .action(exec);
 
+  // 注册发布命令
+  program.command('publish').action(exec);
+
   // $ 指定targetPath
   program.on('option:targetPath', function () {
     const options = program.opts();
