@@ -1,7 +1,11 @@
 const glob = require('glob');
 
-glob('**/*.js', {
-    ignore:['node_modules/**']
-}, (err, file) => {
+glob(
+  '**/*.js',
+  {
+    ignore: ['node_modules/**'],
+  },
+  (err, file) => {
     console.log(file);
-})
+  }
+);

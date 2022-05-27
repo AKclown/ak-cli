@@ -23,7 +23,7 @@
   "scripts": {
     "test": "echo \"Error: run tests from root\" && exit 1"
   },
-  "dependencies":{
+  "dependencies": {
     "@ak-clown/package": "file:../../models/package",
     "@ak-clown/log": "file:../../utils/log",
     "@ak-clown/utils": "file:../../utils/utils"

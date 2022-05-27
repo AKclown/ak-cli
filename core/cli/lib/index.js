@@ -7,11 +7,10 @@ const colors = require('colors');
 const semver = require('semver');
 const process = require('process');
 const userHome = require('userhome')();
-const pathExists = require("path-exists");
+const pathExists = require('path-exists');
 const path = require('path');
 const constants = require('./constants');
 const commander = require('commander');
-const init = require('@ak-clown/init');
 const exec = require('@ak-clown/exec');
 
 // 实例化commander对象实例
@@ -40,19 +39,19 @@ function registerCommand() {
     .name(Object.keys(pkg.bin)[0])
     .usage('<command> [options]')
     .option('-d, --debug', '是否开启调试模式')
-    .option('-tp, --targetPath <targetPath>', '是否指定本地调试文件路径', '')
+    .option('-tp, --targetPath <targetPath>', '是否指定本地调试文件路径', '');
 
   // $ 注册init命令
   program
     .command('init [projectName]')
     .option('-f --force', '是否强制初始化项目')
-    .action(exec)
+    .action(exec);
 
   // $ 指定targetPath
   program.on('option:targetPath', function () {
     const options = program.opts();
     process.env.CLI_TARGET_PATH = options.targetPath;
-  })
+  });
 
   // $ 实现debug功能
   program.on('option:debug', function () {
@@ -63,8 +62,8 @@ function registerCommand() {
       process.env.LOG_LEVEL = 'info';
     }
     log.level = process.env.LOG_LEVEL;
-    log.verbose('开启debug模式')
-  })
+    log.verbose('开启debug模式');
+  });
 
   // $ 监听未知命令
   program.on('command:*', function (obj) {
@@ -73,7 +72,7 @@ function registerCommand() {
     if (availableCommands.length > 0) {
       console.log(`可用命令: ${availableCommands.join(',')}`);
     }
-  })
+  });
   program.parse(process.argv);
   // $ 参数小于3个不解析，第一个是node 第二个是脚手架命令， 第三个才是option
   // if (process.argv.length < 3) {
@@ -84,7 +83,6 @@ function registerCommand() {
     program.outputHelp();
   }
 }
-
 
 function checkPkgVersion() {
   // console.log(pkg.version);
@@ -97,7 +95,9 @@ function checkNodeVersion() {
   const lowestVersion = constant.LOWEST_NODE_VERSION;
 
   if (!semver.gte(currentVersion, lowestVersion)) {
-    throw new Error(colors.red(`ak-cli 需要安装v${lowestVersion}以上的NodeJS版本`))
+    throw new Error(
+      colors.red(`ak-cli 需要安装v${lowestVersion}以上的NodeJS版本`)
+    );
   }
 }
 
@@ -113,43 +113,44 @@ function checkUserHome() {
   }
 }
 
-function checkInputArgs() {
-  const minimist = require('minimist');
-  const args = minimist(process.argv.slice(2));
-  checkArgs(args);
-}
+// function checkInputArgs() {
+//   const minimist = require('minimist');
+//   const args = minimist(process.argv.slice(2));
+//   checkArgs(args);
+// }
 
-function checkArgs(args) {
-  if (args.debug) {
-    process.env.LOG_LEVEL = 'verbose';
-  } else {
-    process.env.LOG_LEVEL = 'info';
-  }
-  log.level = process.env.LOG_LEVEL;
-  log.verbose(colors.red(`verbose日志信息`));
-}
+// function checkArgs(args) {
+//   if (args.debug) {
+//     process.env.LOG_LEVEL = 'verbose';
+//   } else {
+//     process.env.LOG_LEVEL = 'info';
+//   }
+//   log.level = process.env.LOG_LEVEL;
+//   log.verbose(colors.red(`verbose日志信息`));
+// }
 
 function checkEnv() {
   // dotenv环境变量检查，如果环境变量不存在需要设置默认值
   const dotenv = require('dotenv');
   // $ userHome  => C:\Users\ak => C:\Users\ak\.env 根目录下的环境变量文件
   const dotenvPath = path.resolve(userHome, '.env');
+  let config;
   if (pathExists(dotenvPath)) {
     config = dotenv.config({
       // 自定义设置env路径
-      path: dotenvPath
-    })
+      path: dotenvPath,
+    });
   }
   // 设置默认值
   config = createDefaultConfig();
   process.env.DEFAULT_CLI_HOME = config.cliHome;
-  log.verbose('环境变量', config)
+  log.verbose('环境变量', config);
 }
 
 function createDefaultConfig() {
   const cliConfig = {
-    home: userHome
-  }
+    home: userHome,
+  };
   if (process.env.CLI_HOME) {
     cliConfig.cliHome = path.join(userHome, process.env.CLI_HOME);
   } else {
@@ -168,8 +169,11 @@ async function checkGlobalUpdate() {
   // 3. 提取所有版本号，对比那些版本号是大于当前版本
   // 4. 获取最新的版本号，提示用户更新到该版本
   if (lastVersion && semver.gt(lastVersion, currentVersion)) {
-    log.warn('更新提醒', colors.yellow(`请手动更新${npmName},当前版本:${currentVersion},
+    log.warn(
+      '更新提醒',
+      colors.yellow(`请手动更新${npmName},当前版本:${currentVersion},
     最新版本为${lastVersion}
-    更新命令: npm install -g ${npmName}`))
+    更新命令: npm install -g ${npmName}`)
+    );
   }
 }

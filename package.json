@@ -4,8 +4,18 @@
   "description": "脚手架",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "preinstall": "husky install",
+    "prepack": "pinst --disable",
+    "postpack": "pinst --enable",
     "commit": "git cz",
+    "lint-staged": "lint-staged",
+    "commitlint": "commitlint",
+    "lint": "npm run lint:es && npm run lint:prettier",
+    "lint:es": "eslint --ext .js,.jsx,.ts,.tsx ./ --cache",
+    "lint:prettier": "prettier --list-different \"**/*.{css,less,js,jsx,ts,tsx,json,yml,yaml,md}\"",
+    "fix": "npm run fix:es && npm run fix:prettier ",
+    "fix:es": "eslint --ext .js,.jsx,.ts,.tsx ./ --cache --fix",
+    "fix:prettier": "prettier --write \"**/*.{css,less,js,jsx,ts,tsx,json,yml,yaml,md}\"",
     "version": "conventional-changelog -p angular -i CHANGELOG.md -s -r 0 && git add CHANGELOG.md"
   },
   "keywords": [],
@@ -15,8 +25,15 @@
     "@commitlint/cli": "^16.2.3",
     "@commitlint/config-conventional": "^16.2.1",
     "cz-conventional-changelog": "^3.3.0",
+    "eslint": "^8.12.0",
+    "eslint-config-prettier": "^8.5.0",
     "husky": "^7.0.4",
-    "lerna": "^4.0.0"
+    "lerna": "^4.0.0",
+    "lint-staged": "^12.3.7",
+    "prettier": "2.6.2",
+    "stylelint": "^14.6.1",
+    "stylelint-config-prettier": "^9.0.3",
+    "stylelint-config-standard": "^25.0.0"
   },
   "dependencies": {
     "commander": "^8.3.0",
@@ -32,11 +49,6 @@
   "config": {
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"
-    }
-  },
-  "husky": {
-    "hooks": {
-      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
     }
   }
 }
