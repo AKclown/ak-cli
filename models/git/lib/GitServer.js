@@ -39,9 +39,9 @@ class GitServer {
     error('createRepo');
   }
 
-  // 获取SSH KEY的帮助文档
-  getSHHKeysUrl() {
-    error('getSHHKeysUrl');
+  // 获取Token的帮助文档
+  getTokenUrl() {
+    error('getTokenUrl');
   }
 
   // 获取SSH KEY的帮助文档

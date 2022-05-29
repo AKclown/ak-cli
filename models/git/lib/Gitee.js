@@ -1,3 +1,4 @@
+// API文档: https://gitee.com/api/v5/swagger#/getV5UsersUsernameOrgs
 const GitServer = require('./GitServer');
 const GiteeRequest = require('./GiteeRequest');
 
@@ -29,8 +30,8 @@ class Gitee extends GitServer {
   }
 
   // 获取SSH KEY的帮助文档
-  getSHHKeysUrl() {
-    return 'https://gitee.com/profile/sshkeys';
+  getTokenUrl() {
+    return 'https://gitee.com/profile/personal_access_tokens';
   }
 
   // 获取SSH KEY的帮助文档
