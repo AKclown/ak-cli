@@ -18,6 +18,10 @@ const GIT_ROOT_DIR = '.git';
 const GIT_SERVER_FILE = '.git_server';
 // token 存储文件
 const GIT_TOKEN_FILE = '.git_token';
+// 缓存git仓库类型
+const GIT_OWN_FILE = '.git_own';
+// 缓存登录名称 (个人名称/组织名称)
+const GIT_LOGIN_FILE = '.git_login';
 
 // Git托管平台
 const GITHUB = 'github';
@@ -35,23 +39,48 @@ const GIT_SERVER_TYPE = [
   },
 ];
 
+// 仓库类型
+const REPO_OWNER_USER = 'user';
+const REPO_OWNER_ORG = 'org';
+
+const GIt_OWNER_TYPE = [
+  {
+    name: '个人',
+    value: REPO_OWNER_USER,
+  },
+  {
+    name: '组织',
+    value: REPO_OWNER_ORG,
+  },
+];
+
+const GIt_OWNER_TYPE_ONLY = [
+  {
+    name: '个人',
+    value: REPO_OWNER_USER,
+  },
+];
+
 class Git {
   constructor(
     { name, version, dir },
-    { refreshServer = false, refreshToken = false }
+    { refreshServer = false, refreshToken = false, refreshOwner = false }
   ) {
     // ! 这边null为什么要定义出来，好处是提醒自己和给其他人员能够清楚的知道这个类有哪些属性。很多知名的库，都会把类的属性写在构造函数里
-    this.name = name;
-    this.version = version;
-    this.dir = dir;
-    this.git = SimpleGit(dir);
-    this.gitServer = null;
-    this.homePath = null;
-    this.refreshServer = refreshServer;
-    this.refreshToken = refreshToken;
-    this.token = null;
-    this.user = null;
-    this.orgs = null;
+    this.name = name; // 项目名称
+    this.version = version; // 项目版本
+    this.dir = dir; // 项目目录
+    this.git = SimpleGit(dir); // SimpleGit实例
+    this.gitServer = null; // GitServer实例
+    this.homePath = null; // 本地缓存目录
+    this.token = null; // git token
+    this.user = null; // 用户信息
+    this.orgs = null; // 用户所属组织列表
+    this.owner = null; // 远程仓库类型
+    this.login = null; // 远程仓库登录名
+    this.refreshServer = refreshServer; // 是否强制刷新托管的git平台
+    this.refreshToken = refreshToken; // 是否强制刷新远程仓库token
+    this.refreshOwner = refreshOwner; // 是否强制刷新远程仓库类型
   }
   // 准备工作，创建gitServer对象
   async prepare() {
@@ -63,6 +92,8 @@ class Git {
     await this.checkGitToken();
     // $ 获取远程仓库用户和组织信息
     await this.getUserAndOrgs();
+    // $ 确认远程仓库类型
+    await this.checkGitOwner();
   }
 
   // 检查缓存主目录
@@ -164,6 +195,58 @@ class Git {
       throw new Error('组织信息获取失败！');
     }
     log.success(this.gitServer.type + '用户和组织信息获取成功');
+  }
+
+  // 确认远程仓库类型
+  async checkGitOwner() {
+    // 获取/创建缓存文件路径
+    const ownerPath = this.createPath(GIT_OWN_FILE);
+    const loginPath = this.createPath(GIT_LOGIN_FILE);
+    let owner = readFile(ownerPath);
+    let login = readFile(loginPath);
+    if (!owner || !login || this.refreshOwner) {
+      owner = (
+        await inquirer.prompt([
+          {
+            type: 'list',
+            name: 'owner',
+            message: '请选择远程仓库类型',
+            default: REPO_OWNER_USER,
+            choices:
+              this.orgs.length > 0 ? GIt_OWNER_TYPE : GIt_OWNER_TYPE_ONLY,
+          },
+        ])
+      ).owner;
+      if (owner === REPO_OWNER_USER) {
+        login = this.user.login;
+      } else {
+        // 提供选择框给用户选择组织名称
+        login = (
+          await inquirer.prompt([
+            {
+              type: 'list',
+              name: 'login',
+              message: '请选择组织名称',
+              choices: this.orgs.map(item => ({
+                name: item.login,
+                value: item.login,
+              })),
+            },
+          ])
+        ).login;
+      }
+      // 写入到缓存中
+      writeFile(ownerPath, owner);
+      writeFile(loginPath, login);
+      log.success('owner写入成功', `${owner} --> ${ownerPath}`);
+      log.success('login写入成功', `${login} --> ${loginPath}`);
+    } else {
+      log.success('owner读取成功');
+      log.success('login读取成功');
+    }
+    // 讲数据存储到类实例中
+    this.owner = owner; // 远程仓库类型
+    this.login = login; // 远程仓库登录名
   }
 
   // 获取git server 的文件路径
