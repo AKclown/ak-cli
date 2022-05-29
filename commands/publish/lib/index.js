@@ -1,8 +1,8 @@
 const Command = require('@ak-clown/command');
+const Git = require('@ak-clown/command');
 const log = require('@ak-clown/log');
 const path = require('path');
 const fse = require('fs-extra');
-const fs = require('fs');
 class PublishCommand extends Command {
     // 准备阶段
     init() {
@@ -10,13 +10,16 @@ class PublishCommand extends Command {
         console.log('this._argv', this._argv)
     }
     // 执行阶段
-    exec() {
+    async exec() {
         try {
             // 记录发布时间
             const startTime = new Date().getTime();
             // 1. 初始化检查
             this.prepare();
             // 2. Git Flow自动化
+            const git = new Git(this.projectInfo);
+            git.prepare();
+            console.log('git: ', git);
             // 3. 云构建 和 云发布
             const endTime = new Date().getTime();
             log.info('本次发布耗时:', Math.floor((endTime - startTime) / 1000) + '秒')
@@ -33,7 +36,7 @@ class PublishCommand extends Command {
         // 1. 确认项目是否为npm项目 （package.json是否存在）
         const projectPath = process.cwd();
         const pkgPath = path.resolve(projectPath, 'package.json')
-        if (!fs.existsSync(pkgPath)) {
+        if (!fse.pathExistsSync(pkgPath)) {
             throw new Error('package.json不存在');
         }
         // 2. 确认是否包含name、version属性以及build命令

@@ -1,13 +1,14 @@
 {
-  "name": "@ak-clown/publish",
-  "version": "1.0.0",
+  "name": "@ak-clown/git",
+  "version": "1.0.2",
   "description": "> TODO: description",
   "author": "AKclown <13413629530@139.com>",
   "homepage": "https://github.com/AKclown/ak-cli#readme",
   "license": "ISC",
   "main": "lib/index.js",
   "directories": {
-    "lib": "lib"
+    "lib": "lib",
+    "test": "__tests__"
   },
   "files": [
     "lib"
@@ -26,9 +27,8 @@
     "url": "https://github.com/AKclown/ak-cli/issues"
   },
   "dependencies": {
-    "@ak-clown/command": "file:../../models/command",
-    "@ak-clown/git": "file:../../models/git",
-    "@ak-clown/log": "file:../../utils/log",
-    "fs-extra": "^10.1.0"
+    "fs-extra": "^10.1.0",
+    "simple-git": "^3.7.1",
+    "user-home": "^3.0.0"
   }
 }

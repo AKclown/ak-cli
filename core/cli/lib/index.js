@@ -146,7 +146,7 @@ function checkEnv() {
   }
   // 设置默认值
   config = createDefaultConfig();
-  process.env.DEFAULT_CLI_HOME = config.cliHome;
+  process.env.CLI_HOME_PATH = config.cliHome;
   log.verbose('环境变量', config);
 }
 
