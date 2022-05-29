@@ -1,10 +1,21 @@
-# [1.0.0](https://github.com/AKclown/ak-cli/compare/v1.0.2...v1.0.0) (2022-05-27)
+# [1.0.0](https://github.com/AKclown/ak-cli/compare/v1.0.2...v1.0.0) (2022-05-29)
+
 
 ### Features
 
-- 发布模块架构图、完善 git 提交规范 ([8ff4043](https://github.com/AKclown/ak-cli/commit/8ff40432f3334d2f47fd7d7997df99a8abbffd80))
-- **package.json:** 新增 commit 提交规范 ([e6c0227](https://github.com/AKclown/ak-cli/commit/e6c0227ec67b1e5f80b0da28707e3f340e3d9c7f))
+* 发布模块架构图、完善git提交规范 ([8ff4043](https://github.com/AKclown/ak-cli/commit/8ff40432f3334d2f47fd7d7997df99a8abbffd80))
+* 添加publish模块 ([1a9dcf9](https://github.com/AKclown/ak-cli/commit/1a9dcf9f4f492e01b6c67e17d82aab61e0521b50))
+* 项目发布前的检查流程 ([a890ece](https://github.com/AKclown/ak-cli/commit/a890ece362f53fe9d3a01c383de93168e6f01d1d))
+* 新增Git package\检查缓存主目录 ([59b72a3](https://github.com/AKclown/ak-cli/commit/59b72a312f0ee7accaa0e7a8831fa2ca9a08ddac))
+* **package.json:** 新增commit提交规范 ([e6c0227](https://github.com/AKclown/ak-cli/commit/e6c0227ec67b1e5f80b0da28707e3f340e3d9c7f))
+
+
 
 ## [1.0.2](https://github.com/AKclown/ak-cli/compare/v1.0.1...v1.0.2) (2022-01-13)
 
+
+
 ## 1.0.1 (2022-01-13)
+
+
+
