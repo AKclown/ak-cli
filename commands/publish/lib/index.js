@@ -10,6 +10,7 @@ class PublishCommand extends Command {
     log.verbose('publish', this._argv, this._cmd);
     this.options = {
       refreshServer: this._cmd.refreshServer,
+      refreshToken: this._cmd.refreshToken,
     };
   }
 

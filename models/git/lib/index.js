@@ -6,6 +6,7 @@ const fse = require('fs-extra');
 const fs = require('fs');
 const { readFile, writeFile } = require('"@ak-clown/utils');
 const inquirer = require('inquirer');
+const terminalLink = require('terminal-link');
 const Github = require('./Github');
 const Gitee = require('./Gitee');
 
@@ -15,6 +16,8 @@ const DEFAULT_CLI_HOME = 'ak-cli';
 const GIT_ROOT_DIR = '.git';
 // git server文件
 const GIT_SERVER_FILE = '.git_server';
+// token 存储文件
+const GIT_TOKEN_FILE = '.git_token';
 
 // Git托管平台
 const GITHUB = 'github';
@@ -33,7 +36,10 @@ const GIT_SERVER_TYPE = [
 ];
 
 class Git {
-  constructor({ name, version, dir }, { refreshServer = false }) {
+  constructor(
+    { name, version, dir },
+    { refreshServer = false, refreshToken = false }
+  ) {
     this.name = name;
     this.version = version;
     this.dir = dir;
@@ -41,6 +47,8 @@ class Git {
     this.gitServer = null;
     this.homePath = null;
     this.refreshServer = refreshServer;
+    this.refreshToken = refreshToken;
+    this.token = null;
   }
   // 准备工作，创建gitServer对象
   async prepare() {
@@ -48,6 +56,8 @@ class Git {
     this.checkHomePath();
     // $ 检查用户远程仓库类型
     await this.checkGitServer();
+    // $ 检查并且拿到token
+    await this.checkGitToken();
   }
 
   // 检查缓存主目录
@@ -94,6 +104,37 @@ class Git {
     if (!this.gitServer) {
       throw new Error('GitServer初始化失败！');
     }
+  }
+
+  // 检查并且拿到token
+  async checkGitToken() {
+    const gitTokenPath = this.createPath(GIT_TOKEN_FILE);
+    // 读取到GIT_TOKEN_FILE的文件内容
+    let token = readFile(gitTokenPath);
+    if (!token) {
+      // $ 除了提示token不存在外，换需要提供生成token的帮助链接 - 如果是自己的脚手架，可以引用自己的书写的文档
+      log.warn(
+        this.gitServer.type + 'token未生成',
+        '请先生成' +
+          this.gitServer.type +
+          'token,' +
+          terminalLink(this.gitServer.getTokenHelpUrl())
+      );
+      token = (
+        await inquirer.prompt({
+          type: 'password',
+          name: 'token',
+          message: '请将token复制到这里',
+          default: '',
+        })
+      ).token;
+      writeFile(gitTokenPath, token);
+      log.success('token写入成功', `${token} --> ${gitTokenPath}`);
+    } else {
+      log.success('token获取成功');
+    }
+    this.token = token;
+    this.gitServer.setToken(token);
   }
 
   //  实例化git server

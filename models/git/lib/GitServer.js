@@ -38,6 +38,16 @@ class GitServer {
   getOrg() {
     error('createRepo');
   }
+
+  // 获取SSH KEY的帮助文档
+  getSHHKeysUrl() {
+    error('getSHHKeysUrl');
+  }
+
+  // 获取SSH KEY的帮助文档
+  getTokenHelpUrl() {
+    error('getTokenHelpUrl');
+  }
 }
 
 module.exports = GitServer;
