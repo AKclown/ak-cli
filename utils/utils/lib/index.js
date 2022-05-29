@@ -1,4 +1,4 @@
-'use strict';
+const fs = require('fs');
 function isObject(obj) {
   return Object.prototype.toString.call(obj) === '[object Object]';
 }
@@ -35,10 +35,42 @@ function execAsync(command, args, options) {
   });
 }
 
+// 文件内容读取
+function readFile(path, option = {}) {
+  if (fs.existsSync(path)) {
+    const buffer = fs.readFileSync(path);
+    if (buffer) {
+      if (option.toJson) {
+        return buffer.toJSON();
+      } else {
+        return buffer.toString();
+      }
+    }
+    return null;
+  }
+  return null;
+}
+
+// 写入文件内容
+function writeFile(path, data, { rewrite = true } = {}) {
+  if (fs.existsSync(path)) {
+    if (rewrite) {
+      fs.writeFileSync(path, data);
+      return true;
+    }
+    return false;
+  } else {
+    fs.writeFileSync(path, data);
+    return true;
+  }
+}
+
 module.exports = {
   isObject,
   spinnerStart,
   sleep,
   exec,
   execAsync,
+  readFile,
+  writeFile,
 };

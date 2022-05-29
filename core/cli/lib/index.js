@@ -48,7 +48,10 @@ function registerCommand() {
     .action(exec);
 
   // 注册发布命令
-  program.command('publish').action(exec);
+  program
+    .command('publish')
+    .option('--refreshServer', '强制更新远程Git仓库')
+    .action(exec);
 
   // $ 指定targetPath
   program.on('option:targetPath', function () {
