@@ -6,6 +6,8 @@ const fse = require('fs-extra');
 const fs = require('fs');
 const { readFile, writeFile } = require('"@ak-clown/utils');
 const inquirer = require('inquirer');
+const Github = require('./Github');
+const Gitee = require('./Gitee');
 
 // 主目录
 const DEFAULT_CLI_HOME = 'ak-cli';
@@ -88,6 +90,20 @@ class Git {
     } else {
       log.success('git server 获取成功', gitServer);
     }
+    this.gitServer = this.createGitServer(gitServer);
+    if (!this.gitServer) {
+      throw new Error('GitServer初始化失败！');
+    }
+  }
+
+  //  实例化git server
+  createGitServer(gitServer) {
+    if (gitServer === GITHUB) {
+      return new Github();
+    } else if (gitServer === GITEE) {
+      return new Gitee();
+    }
+    return null;
   }
 
   // 获取git server 的文件路径
