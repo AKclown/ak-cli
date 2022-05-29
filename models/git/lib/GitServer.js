@@ -9,8 +9,8 @@ class GitServer {
   }
 
   // 设置token
-  setToken() {
-    error('setToken');
+  setToken(token) {
+    this.token = token;
   }
 
   // $ 定义子类必须实现方法

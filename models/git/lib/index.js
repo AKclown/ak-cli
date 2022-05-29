@@ -40,6 +40,7 @@ class Git {
     { name, version, dir },
     { refreshServer = false, refreshToken = false }
   ) {
+    // ! 这边null为什么要定义出来，好处是提醒自己和给其他人员能够清楚的知道这个类有哪些属性。很多知名的库，都会把类的属性写在构造函数里
     this.name = name;
     this.version = version;
     this.dir = dir;
@@ -49,6 +50,8 @@ class Git {
     this.refreshServer = refreshServer;
     this.refreshToken = refreshToken;
     this.token = null;
+    this.user = null;
+    this.orgs = null;
   }
   // 准备工作，创建gitServer对象
   async prepare() {
@@ -58,6 +61,8 @@ class Git {
     await this.checkGitServer();
     // $ 检查并且拿到token
     await this.checkGitToken();
+    // $ 获取远程仓库用户和组织信息
+    await this.getUserAndOrgs();
   }
 
   // 检查缓存主目录
@@ -145,6 +150,20 @@ class Git {
       return new Gitee();
     }
     return null;
+  }
+
+  // 获取远程仓库用户和组织信息
+  async getUserAndOrgs() {
+    this.user = await this.gitServer.getUser();
+    if (!this.user) {
+      throw new Error('用户信息获取失败！');
+    }
+    this.orgs = await this.gitServer.getOrgs(this.user.login);
+    if (!this.orgs) {
+      // this.orgs可以使空数组，但不能为null
+      throw new Error('组织信息获取失败！');
+    }
+    log.success(this.gitServer.type + '用户和组织信息获取成功');
   }
 
   // 获取git server 的文件路径

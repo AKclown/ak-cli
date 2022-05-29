@@ -4,6 +4,7 @@
 
 - 创建 GitServe 基类 ([3a2fbfe](https://github.com/AKclown/ak-cli/commit/3a2fbfe95a063719c6229a6a4e8de4287ccbafe2))
 - 发布模块架构图、完善 git 提交规范 ([8ff4043](https://github.com/AKclown/ak-cli/commit/8ff40432f3334d2f47fd7d7997df99a8abbffd80))
+- 生成远程仓库 token ([fb96297](https://github.com/AKclown/ak-cli/commit/fb9629725ff7b5fab57a82913fb7deb89b717103))
 - 添加 publish 模块 ([1a9dcf9](https://github.com/AKclown/ak-cli/commit/1a9dcf9f4f492e01b6c67e17d82aab61e0521b50))
 - 项目发布前的检查流程 ([a890ece](https://github.com/AKclown/ak-cli/commit/a890ece362f53fe9d3a01c383de93168e6f01d1d))
 - 新增 Git package\检查缓存主目录 ([59b72a3](https://github.com/AKclown/ak-cli/commit/59b72a312f0ee7accaa0e7a8831fa2ca9a08ddac))
