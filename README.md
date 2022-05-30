@@ -39,3 +39,11 @@ ak-cli publish  --targetPath E:/project/project/ak-cli/core/cli/commands/publish
 ### 发布的整体架构图
 
 ![脚手架发布整体架构设计](./doc/diagram/publish-architecture-design.png)
+
+### 注意
+
+1. 使用 npm 无法在 script 命令后面加一些参数， 但是 yarn 可以，所以 husky 中的命令使用 yarn 运行
+
+### TODO
+
+1. 后续使用 yarn dlx only-allow yarn 强制 yarn 包管理
