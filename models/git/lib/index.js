@@ -106,6 +106,20 @@ class Git {
     await this.init();
   }
 
+  // 代码自动化提交
+  async commit() {
+    // 1. 生成开发分支
+    await this.getCorrectVersion();
+    // 2. 在开发分支上提交代码
+
+    // 3. 合并远程开发分支
+
+    // 4. 推送远程分支
+  }
+
+  // 生成开发分支
+  async getCorrectVersion() {}
+
   // 实现本地仓库初始化
   async init() {
     // 以及初始化过仓库就不存在重新初始化，如果存在commit重新初始化 会丢失commit
