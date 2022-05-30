@@ -127,6 +127,15 @@ class Git {
      */
     await this.checkConflicted();
     await this.checkNotCommit();
+
+    if (await this.checkRemoteMaster()) {
+      await this.pullRemoteRepo('master', {
+        // 该仓储解决两个没有关系的代码分支进行合并
+        '--allow-unrelated-histories': null,
+      });
+    } else {
+      await this.pushRemoteRepo('master');
+    }
   }
 
   // 检查代码冲突
@@ -141,8 +150,58 @@ class Git {
 
   // 检查是否有未提交的数据
   async checkNotCommit() {
-    // const status = await this.git.status();
-    // if(status.no_added)
+    const status = await this.git.status();
+    // 所有可能导致未提交的状态都需要加上
+    if (
+      status.no_added.length > 0 ||
+      status.created.length > 0 ||
+      status.deleted.length > 0 ||
+      status.modified.length > 0 ||
+      status.renamed.length > 0
+    ) {
+      log.verbose('status', status);
+      // 添加到本地暂存区域
+      await this.git.add(status.no_added);
+      await this.git.add(status.created);
+      await this.git.add(status.deleted);
+      await this.git.add(status.modified);
+      await this.git.add(status.renamed);
+      // 定义提交信息
+      let message;
+      while (!message) {
+        message = (
+          await inquirer.prompt({
+            type: 'text',
+            name: 'message',
+            message: '请输入commit信息',
+          })
+        ).message;
+      }
+      // commit数据
+      await this.git.commit(message);
+      log.success('本次commit提交成功');
+    }
+  }
+
+  // 检查master分支是否存在
+  async checkRemoteMaster() {
+    // git ls-remote 在远程仓库中列出所有的引用，master分支存在势必会有  refs/heads/master
+    return (
+      (await this.git.listRemote('--refs')).indexOf('refs/heads/master') >= 0
+    );
+  }
+
+  // 推送远程仓库
+  async pushRemoteRepo(branchName) {
+    log.info(`推送代码至${branchName}分支`);
+    await this.git.push('origin', branchName);
+    log.success('代码推送成功');
+  }
+
+  // 拉取远程仓库
+  async pullRemoteRepo(branchName, option) {
+    log.info(`同步远程${branchName}分支代码`);
+    await this.git.pull('origin', branchName, option);
   }
 
   // 获取到远程
