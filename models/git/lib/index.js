@@ -22,6 +22,8 @@ const GIT_TOKEN_FILE = '.git_token';
 const GIT_OWN_FILE = '.git_own';
 // 缓存登录名称 (个人名称/组织名称)
 const GIT_LOGIN_FILE = '.git_login';
+// .ignore文件
+const GIT_IGNORE_FILE = '.gitignore';
 
 // Git托管平台
 const GITHUB = 'github';
@@ -96,6 +98,8 @@ class Git {
     await this.checkGitOwner();
     // $ 检查并创建远程仓库
     await this.checkRepo();
+    // $ 检查并创建.gitignore文件
+    this.checkGitIgnore();
   }
 
   // 检查缓存主目录
@@ -276,6 +280,28 @@ class Git {
       log.success('远程仓库信息获取成功');
     }
     this.repo = repo;
+  }
+
+  // 检查并创建.gitignore文件
+  checkGitIgnore() {
+    const gitIgnorePath = path.resolve(this.dir, GIT_IGNORE_FILE);
+    if (!fs.existsSync(gitIgnorePath)) {
+      writeFile(
+        gitIgnorePath,
+        `.idea/
+      .DS_Store
+      node_modules/
+      package-lock.json
+      yarn.lock
+      .vscode/
+      .history/
+      logs/
+      target/
+      pid`
+      );
+
+      log.success(`自动写入${GIT_IGNORE_FILE}文件成功`);
+    }
   }
 
   // 获取git server 的文件路径
