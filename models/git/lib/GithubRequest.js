@@ -41,6 +41,15 @@ class GithubRequest {
       header,
     });
   }
+
+  post(url, data, header) {
+    return this.service({
+      url,
+      data,
+      method: 'post',
+      header,
+    });
+  }
 }
 
 module.exports = GithubRequest;

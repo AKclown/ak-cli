@@ -1,4 +1,4 @@
-# [1.0.0](https://github.com/AKclown/ak-cli/compare/v1.0.2...v1.0.0) (2022-05-29)
+# [1.0.0](https://github.com/AKclown/ak-cli/compare/v1.0.2...v1.0.0) (2022-05-30)
 
 ### Features
 
@@ -11,6 +11,8 @@
 - 项目发布前的检查流程 ([a890ece](https://github.com/AKclown/ak-cli/commit/a890ece362f53fe9d3a01c383de93168e6f01d1d))
 - 新增 Git package\检查缓存主目录 ([59b72a3](https://github.com/AKclown/ak-cli/commit/59b72a312f0ee7accaa0e7a8831fa2ca9a08ddac))
 - 选择远程 Git 仓库逻辑 ([32656d8](https://github.com/AKclown/ak-cli/commit/32656d890ab16da68cc737f9a7bb956b17ae240e))
+- 远程仓库类型选择 ([b7215b8](https://github.com/AKclown/ak-cli/commit/b7215b81ffd41a1cfd106f704f6a889a0c509f53))
+- gitee 获取远程仓库以及创建远程仓库 ([c52e7cf](https://github.com/AKclown/ak-cli/commit/c52e7cfdbd657e2fa659ffc6ac8140f1e3548443))
 - **package.json:** 新增 commit 提交规范 ([e6c0227](https://github.com/AKclown/ak-cli/commit/e6c0227ec67b1e5f80b0da28707e3f340e3d9c7f))
 - readme 追加 init 模板下载架构图 ([3a9d898](https://github.com/AKclown/ak-cli/commit/3a9d898ae8bd494da42b0a9894402a5a0db7f7d8))
 
