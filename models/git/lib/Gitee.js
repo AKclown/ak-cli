@@ -59,6 +59,11 @@ class Gitee extends GitServer {
     this.request.post(`/orgs/${login}/repos`, { name });
   }
 
+  // 获取仓库地址
+  getRemote(login, name) {
+    return `git@gitee.com:${login}/${name}.git`;
+  }
+
   // 获取SSH KEY的帮助文档
   getTokenUrl() {
     return 'https://gitee.com/profile/personal_access_tokens';

@@ -80,6 +80,7 @@ class Git {
     this.orgs = null; // 用户所属组织列表
     this.owner = null; // 远程仓库类型
     this.login = null; // 远程仓库登录名
+    this.remote = null; // 远程仓库
     this.refreshServer = refreshServer; // 是否强制刷新托管的git平台
     this.refreshToken = refreshToken; // 是否强制刷新远程仓库token
     this.refreshOwner = refreshOwner; // 是否强制刷新远程仓库类型
@@ -100,6 +101,41 @@ class Git {
     await this.checkRepo();
     // $ 检查并创建.gitignore文件
     this.checkGitIgnore();
+
+    // $实现本地仓库初始化
+    await this.init();
+  }
+
+  // 实现本地仓库初始化
+  async init() {
+    // 以及初始化过仓库就不存在重新初始化，如果存在commit重新初始化 会丢失commit
+    if (this.getRemote()) {
+      return;
+    }
+    await this.initAndAddRemote();
+  }
+
+  // 获取到远程
+  getRemote() {
+    const gitPath = path.resolve(this.dir, GIT_ROOT_DIR);
+    this.remote = this.gitServer.getRemote(this.login, this.name);
+    if (fs.existsSync(gitPath)) {
+      log.success('git已完成初始化');
+      return true;
+    }
+  }
+
+  // 初始化和关联远程仓库
+  async initAndAddRemote() {
+    log.info('执行git初始化');
+    await this.git.init(this.dir);
+    log.info('添加git remote');
+    const remotes = await this.git.getRemotes();
+    log.verbose('git remotes', remotes);
+    // ??? 有一点疑惑，如果当前的origin不是当前仓库的呢？ 而是别的仓库的
+    if (!remotes.find(item => item.name === 'origin')) {
+      await this.git.addRemote('origin', this.remote);
+    }
   }
 
   // 检查缓存主目录
@@ -312,9 +348,6 @@ class Git {
     fse.ensureDirSync(rootDir);
     return filePath;
   }
-
-  // 初始化操作
-  init() {}
 }
 
 module.exports = Git;

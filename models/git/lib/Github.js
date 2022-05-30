@@ -75,6 +75,11 @@ class Github extends GitServer {
     );
   }
 
+  // 获取仓库地址
+  getRemote(login, name) {
+    return `git@github.com:${login}/${name}.git`;
+  }
+
   // 获取SSH KEY的帮助文档
   getTokenUrl() {
     return 'https://github.com/settings/tokens';
