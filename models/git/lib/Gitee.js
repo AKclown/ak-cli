@@ -29,6 +29,36 @@ class Gitee extends GitServer {
     });
   }
 
+  // 获取远程仓库
+  getRepo(login, name) {
+    return this.request.get(`/repos/${login}/${name}`).then(response => {
+      return this.handleResponse(response);
+    });
+  }
+
+  // 是否为http请求
+  isHttpResponse(response) {
+    return response && response.status;
+  }
+
+  handleResponse(response) {
+    // $ 仓库存在和不存在返回的数据不一样，做数据处理
+    if (this.isHttpResponse(response) && response !== 200) {
+      return null;
+    }
+    return response;
+  }
+
+  // 创建个人仓库
+  createRepo(name) {
+    this.request.post('/user/repos', { name });
+  }
+
+  // 创建组织仓库
+  createOrgRepo(name, login) {
+    this.request.post(`/orgs/${login}/repos`, { name });
+  }
+
   // 获取SSH KEY的帮助文档
   getTokenUrl() {
     return 'https://gitee.com/profile/personal_access_tokens';

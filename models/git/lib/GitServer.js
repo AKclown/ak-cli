@@ -15,13 +15,13 @@ class GitServer {
 
   // $ 定义子类必须实现方法
   // 创建个人仓库
-  createRepo() {
-    error('createRepo');
+  createRepo(name) {
+    error('createRepo', name);
   }
 
   // 创建组织仓库
-  createOrgRepo() {
-    error('createRepo');
+  createOrgRepo(name, login) {
+    error('createRepo', name, login);
   }
 
   // 获取仓库地址
@@ -37,6 +37,11 @@ class GitServer {
   // 获取到组织信息
   getOrg() {
     error('createRepo');
+  }
+
+  // 获取远程仓库
+  getRepo(login, name) {
+    error('getRepo', login, name);
   }
 
   // 获取Token的帮助文档

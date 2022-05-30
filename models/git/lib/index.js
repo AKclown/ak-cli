@@ -4,7 +4,7 @@ const path = require('path');
 const userHome = require('user-home');
 const fse = require('fs-extra');
 const fs = require('fs');
-const { readFile, writeFile } = require('"@ak-clown/utils');
+const { spinnerStart, readFile, writeFile } = require('"@ak-clown/utils');
 const inquirer = require('inquirer');
 const terminalLink = require('terminal-link');
 const Github = require('./Github');
@@ -94,6 +94,8 @@ class Git {
     await this.getUserAndOrgs();
     // $ 确认远程仓库类型
     await this.checkGitOwner();
+    // $ 检查并创建远程仓库
+    await this.checkRepo();
   }
 
   // 检查缓存主目录
@@ -247,6 +249,33 @@ class Git {
     // 讲数据存储到类实例中
     this.owner = owner; // 远程仓库类型
     this.login = login; // 远程仓库登录名
+  }
+
+  // 检查并创建远程仓库
+  async checkRepo() {
+    let repo = this.gitServer.getRepo(this.login, this.name);
+    if (!repo) {
+      let spinner = spinnerStart('开始创建远程仓库...');
+      try {
+        if (this.owner === REPO_OWNER_USER) {
+          repo = this.gitServer.createRepo(this.name);
+        } else {
+          repo = this.gitServer.createOrgRepo(this.name, this.login);
+        }
+      } catch (error) {
+        log.error(error);
+      } finally {
+        spinner.stop(true);
+      }
+      if (repo) {
+        log.success('远程仓库创建成功');
+      } else {
+        throw new Error('远程仓库创建失败');
+      }
+    } else {
+      log.success('远程仓库信息获取成功');
+    }
+    this.repo = repo;
   }
 
   // 获取git server 的文件路径
