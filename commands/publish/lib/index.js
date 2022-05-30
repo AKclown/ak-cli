@@ -1,5 +1,5 @@
 const Command = require('@ak-clown/command');
-const Git = require('@ak-clown/command');
+const Git = require('@ak-clown/git');
 const log = require('@ak-clown/log');
 const path = require('path');
 const fse = require('fs-extra');
@@ -24,8 +24,7 @@ class PublishCommand extends Command {
       this.prepare();
       // 2. Git Flow自动化
       const git = new Git(this.projectInfo, this.options);
-      git.prepare();
-      console.log('git: ', git);
+      await git.prepare();
       // 3. 云构建 和 云发布
       const endTime = new Date().getTime();
       log.info(
@@ -44,6 +43,7 @@ class PublishCommand extends Command {
   prepare() {
     // 1. 确认项目是否为npm项目 （package.json是否存在）
     const projectPath = process.cwd();
+    console.log('projectPath: ', projectPath);
     const pkgPath = path.resolve(projectPath, 'package.json');
     if (!fse.pathExistsSync(pkgPath)) {
       throw new Error('package.json不存在');
@@ -61,10 +61,10 @@ class PublishCommand extends Command {
   }
 }
 
-function init(args) {
+function publish(args) {
   // $ 这个args就是执行脚手架传入的参数
   return new PublishCommand(args);
 }
 
-module.exports = init;
+module.exports = publish;
 module.exports.PublishCommand = PublishCommand;

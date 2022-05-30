@@ -8,6 +8,12 @@ ak-cli 工具
 ak-cli init --targetPath /Users/ak/Desktop/project/ak-cli/commands/init --force --debug test-project
 ```
 
+### publish 命令
+
+```
+ak-cli publish  --targetPath E:/project/project/ak-cli/core/cli/commands/publish
+```
+
 ### 提交规范
 
 1. commitizen
@@ -18,7 +24,11 @@ ak-cli init --targetPath /Users/ak/Desktop/project/ak-cli/commands/init --force 
 
 3. @commitlint/cli (校验提交说明是否符合规范)
 4. @commitlint/config-conventional (安装符合 Angular 风格的校验规则)
-5. husky (git 钩子工具)
+5. husky/lint-staged(git 钩子工具)
+
+### git 命令
+
+[git 命令](https://cloud.tencent.com/developer/section/1138701)
 
 [commit 参考文献](https://godbasin.github.io/2019/11/10/change-log/)
 

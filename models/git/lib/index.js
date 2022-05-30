@@ -4,14 +4,14 @@ const path = require('path');
 const userHome = require('user-home');
 const fse = require('fs-extra');
 const fs = require('fs');
-const { spinnerStart, readFile, writeFile } = require('"@ak-clown/utils');
+const { spinnerStart, readFile, writeFile } = require('@ak-clown/utils');
 const inquirer = require('inquirer');
 const terminalLink = require('terminal-link');
 const Github = require('./Github');
 const Gitee = require('./Gitee');
 
 // 主目录
-const DEFAULT_CLI_HOME = 'ak-cli';
+const DEFAULT_CLI_HOME = '.ak-cli';
 // git主目录
 const GIT_ROOT_DIR = '.git';
 // git server文件
@@ -112,7 +112,37 @@ class Git {
     if (this.getRemote()) {
       return;
     }
+    // 初始化git仓库和add remote关联远程仓库
     await this.initAndAddRemote();
+    // 初始化提交
+    await this.initCommit();
+  }
+
+  // 初始化提交
+  async initCommit() {
+    /**
+     * 1.检查代码冲突
+     * 2.检查是否有未提交的数据
+     * 3.检查是否存在master分支
+     */
+    await this.checkConflicted();
+    await this.checkNotCommit();
+  }
+
+  // 检查代码冲突
+  async checkConflicted() {
+    log.info('代码冲突检查');
+    const status = await this.git.status();
+    if (status.conflicted.length > 0) {
+      throw new Error('当前代码存在冲突,请手动处理合并后再试！');
+    }
+    log.success('代码冲突检查通过');
+  }
+
+  // 检查是否有未提交的数据
+  async checkNotCommit() {
+    // const status = await this.git.status();
+    // if(status.no_added)
   }
 
   // 获取到远程
@@ -164,15 +194,17 @@ class Git {
     // 不存在文件内容，提供选择  给 用户选择git平台
     if (!gitServer || this.refreshServer) {
       // 选择托管的git平台
-      const { gitServer } = await inquirer.prompt([
-        {
-          type: 'list',
-          name: 'gitServer',
-          message: '请选择你想要托管的Git平台',
-          default: GITHUB,
-          choices: GIT_SERVER_TYPE,
-        },
-      ]);
+      gitServer = (
+        await inquirer.prompt([
+          {
+            type: 'list',
+            name: 'gitServer',
+            message: '请选择你想要托管的Git平台',
+            default: GITHUB,
+            choices: GIT_SERVER_TYPE,
+          },
+        ])
+      ).gitServer;
       writeFile(gitServerPath, gitServer);
       log.success('git server 写入成功', `${gitServer} --> ${gitServerPath}`);
     } else {
@@ -195,8 +227,7 @@ class Git {
         this.gitServer.type + 'token未生成',
         '请先生成' +
           this.gitServer.type +
-          'token,' +
-          terminalLink(this.gitServer.getTokenHelpUrl())
+          terminalLink('的token,参考文献:', this.gitServer.getTokenHelpUrl())
       );
       token = (
         await inquirer.prompt({

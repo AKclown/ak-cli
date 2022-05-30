@@ -87,7 +87,7 @@ class Github extends GitServer {
 
   // 获取SSH KEY的帮助文档
   getTokenHelpUrl() {
-    return 'https://docs.github.com/cn/authentication/connecting-to-github-with-ssh/testing-your-ssh-connection';
+    return 'https://github.com/settings/tokens/new';
   }
 }
 
