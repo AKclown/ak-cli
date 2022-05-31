@@ -86,6 +86,7 @@ class Git {
     this.owner = null; // 远程仓库类型
     this.login = null; // 远程仓库登录名
     this.remote = null; // 远程仓库
+    this.branch = null; // 本地的开发分支
     this.refreshServer = refreshServer; // 是否强制刷新托管的git平台
     this.refreshToken = refreshToken; // 是否强制刷新远程仓库token
     this.refreshOwner = refreshOwner; // 是否强制刷新远程仓库类型
@@ -134,6 +135,72 @@ class Git {
       releaseVersion = remoteBranchList[0];
     }
     log.verbose('线上最新版本', releaseVersion);
+    const devVersion = this.version;
+    if (!releaseVersion) {
+      // 最新远程发布版本号不存在， 采用package.json的version作为分支的版本号
+      this.branch = `${VERSION_DEVELOP}/${devVersion}`;
+    } else if (semver.gt(devVersion, releaseVersion)) {
+      log.info(
+        '当前版本大于最新线上版本',
+        `${devVersion} => ${releaseVersion}`
+      );
+      this.branch = `${VERSION_DEVELOP}/${devVersion}`;
+    } else {
+      log.info(
+        '当前线上版本大于本地版本',
+        `${releaseVersion} => ${devVersion}`
+      );
+      // 遵循版本控制规则，major/minor/patch
+      const incType = (
+        await inquirer.prompt([
+          {
+            type: 'list',
+            name: 'incType',
+            message: '自动升级版本，请选择升级版本类型',
+            default: 'patch',
+            choices: [
+              {
+                name: `小版本 (${releaseVersion} -> ${semver.inc(
+                  releaseVersion,
+                  'patch'
+                )})`,
+                value: 'patch',
+              },
+              {
+                name: `中版本 (${releaseVersion} -> ${semver.inc(
+                  releaseVersion,
+                  'minor'
+                )})`,
+                value: 'minor',
+              },
+              {
+                name: `大版本 (${releaseVersion} -> ${semver.inc(
+                  releaseVersion,
+                  'major'
+                )})`,
+                value: 'major',
+              },
+            ],
+          },
+        ])
+      ).incType;
+      // 获取到封信的版本
+      const incVersion = semver.inc(releaseVersion, incType);
+      this.branch = `${VERSION_DEVELOP}/${incVersion}`;
+      this.version = incVersion;
+    }
+    log.verbose('本地开发分支', this.branch);
+    // 同步版本到package.json当中
+    this.syncVersionToPackageJson();
+  }
+
+  // 同步版本到package.json当中
+  syncVersionToPackageJson() {
+    const pkg = fse.readJsonSync(`${this.dir}/package.json`);
+    if (pkg && pkg.version) {
+      pkg.version = this.version;
+      fse.writeJSONSync(`${this.dir}/package.json`, pkg, { spaces: 2 });
+    }
   }
 
   // 获取到远程的分支列表
