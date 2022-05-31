@@ -118,10 +118,47 @@ class Git {
     await this.getCorrectVersion();
     // 2. 检查stash区域
     await this.checkStash();
-
     // 3. 检查代码冲突
+    await this.checkConflicted();
+    // TODO： 这个切换开发分支顺序还是有疑问？
+    // 4. 切换开发分支
+    await this.checkoutBranch(this.branch);
+    // 5.合并远程master分支和开发分支代码
+    await this.pullRemoteMaterAndBranch();
+    // 6. 将开发分支推送到远程仓库
+    await this.pushRemoteRepo(this.branch);
+  }
 
-    // 4. 推送远程分支
+  // 合并远程master分支和开发分支代码
+  async pullRemoteMaterAndBranch() {
+    log.info(`合并 [master] -> [${this.branch}]`);
+    await this.pullRemoteRepo('master');
+    log.success(`合并远程 [master] 分支代码成功`);
+    // 检查冲突
+    this.checkConflicted();
+    // 判断远程是否具有当前开发分支
+    const remoteBranchList = this.getRemoteBranchList();
+    if (remoteBranchList.indexOf(this.branch) >= 0) {
+      log.info(`合并 [${this.branch}] -> [${this.branch}]`);
+      await this.pullRemoteRepo(this.branch);
+      log.success(`合并远程 [${this.branch}] 分支代码成功`);
+      // $ 检查冲突
+      this.checkConflicted();
+    } else {
+      log.success(`不存在远程分支 [${this.branch}]`);
+    }
+  }
+
+  // 切换开发分支
+  async checkoutBranch(branchName) {
+    const localBranchList = await this.git.branchLocal();
+    if (localBranchList.all.indexOf(branchName) >= 0) {
+      // 本地存在该开发分支
+      await this.git.checkout(branchName);
+    } else {
+      await this.git.checkoutLocalBranch(branchName);
+    }
+    log.success(`分支切换到${branchName}`);
   }
 
   // 检查stash区域
@@ -224,8 +261,8 @@ class Git {
     if (type === VERSION_RELEASE) {
       // refs/tags/release/1.0.0
       req = /.+?refs\/tags\/release\/(\d+\.\d+\.\d+)/g;
-    } else if (type === VERSION_DEVELOP) {
-      //
+    } else {
+      req = /.+?refs\/heads\/dev\/(\d+\.\d+\.\d+)/g;
     }
     // 获取到版本号数组
     remoteList
@@ -248,6 +285,8 @@ class Git {
         }
         return 1;
       });
+
+    return remoteList;
   }
 
   // 实现本地仓库初始化
