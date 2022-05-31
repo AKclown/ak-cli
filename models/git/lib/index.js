@@ -7,6 +7,7 @@ const fs = require('fs');
 const { spinnerStart, readFile, writeFile } = require('@ak-clown/utils');
 const inquirer = require('inquirer');
 const terminalLink = require('terminal-link');
+const semver = require('semver');
 const Github = require('./Github');
 const Gitee = require('./Gitee');
 
@@ -63,6 +64,10 @@ const GIt_OWNER_TYPE_ONLY = [
   },
 ];
 
+// 版本类型
+const VERSION_RELEASE = 'release';
+const VERSION_DEVELOP = 'dev';
+
 class Git {
   constructor(
     { name, version, dir },
@@ -118,7 +123,53 @@ class Git {
   }
 
   // 生成开发分支
-  async getCorrectVersion() {}
+  async getCorrectVersion() {
+    // 1.生成远程发布分支
+    // 版本号规范: release/x.y.z  dev/x.y.z
+    // 版本号递增规范: major/ minor / patch
+    log.info('代码分支的获取');
+    const remoteBranchList = await this.getRemoteBranchList(VERSION_RELEASE);
+    let releaseVersion = null;
+    if (remoteBranchList && remoteBranchList.length > 0) {
+      releaseVersion = remoteBranchList[0];
+    }
+    log.verbose('线上最新版本', releaseVersion);
+  }
+
+  // 获取到远程的分支列表
+  async getRemoteBranchList(type) {
+    // 通过git ls-remote来列出所有的远程分支
+    const remoteList = await this.git.listRemote(['--refs']);
+    // 定义一个正则拿到开发或者发布分支
+    let req;
+    if (type === VERSION_RELEASE) {
+      // refs/tags/release/1.0.0
+      req = /.+?refs\/tags\/release\/(\d+\.\d+\.\d+)/g;
+    } else if (type === VERSION_DEVELOP) {
+      //
+    }
+    // 获取到版本号数组
+    remoteList
+      .split('\n')
+      .map(remote => {
+        const match = req.exec(remote);
+        // 必须重置正则起始位置
+        req.lastIndex = 0;
+        if (match && semver.valid(match[1])) {
+          return match[1];
+        }
+      })
+      .filter(_ => _)
+      .sort((a, b) => {
+        if (semver.lt(b, a)) {
+          if (a === b) {
+            return 0;
+          }
+          return -1;
+        }
+        return 1;
+      });
+  }
 
   // 实现本地仓库初始化
   async init() {
