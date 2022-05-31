@@ -32,6 +32,10 @@ ak-cli publish  --targetPath E:/project/project/ak-cli/core/cli/commands/publish
 
 [commit 参考文献](https://godbasin.github.io/2019/11/10/change-log/)
 
+### 脚手架整体架构设计
+
+![架构设计](./doc/diagram//overall-architecture-design.png)
+
 ### 初始化模板下载的架构设计图
 
 ![init模板下载架构图](./doc/diagram/init-model-design.png)
