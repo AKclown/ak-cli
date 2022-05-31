@@ -116,11 +116,23 @@ class Git {
   async commit() {
     // 1. 生成开发分支
     await this.getCorrectVersion();
-    // 2. 在开发分支上提交代码
+    // 2. 检查stash区域
+    await this.checkStash();
 
-    // 3. 合并远程开发分支
+    // 3. 检查代码冲突
 
     // 4. 推送远程分支
+  }
+
+  // 检查stash区域
+  async checkStash() {
+    log.info('检查stash记录');
+    const stashList = await this.git.stashList();
+    // 查看是否存在stash数据
+    if (stashList.all.length > 0) {
+      await this.git.stash(['pop']);
+      log.success('stash pop成功');
+    }
   }
 
   // 生成开发分支
