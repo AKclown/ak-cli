@@ -137,7 +137,7 @@ class Git {
     // 检查冲突
     this.checkConflicted();
     // 判断远程是否具有当前开发分支
-    const remoteBranchList = this.getRemoteBranchList();
+    const remoteBranchList = await this.getRemoteBranchList();
     if (remoteBranchList.indexOf(this.branch) >= 0) {
       log.info(`合并 [${this.branch}] -> [${this.branch}]`);
       await this.pullRemoteRepo(this.branch);
@@ -255,7 +255,8 @@ class Git {
   // 获取到远程的分支列表
   async getRemoteBranchList(type) {
     // 通过git ls-remote来列出所有的远程分支
-    const remoteList = await this.git.listRemote(['--refs']);
+    let remoteList = await this.git.listRemote(['--refs']);
+    console.log('remoteList: ', remoteList.split('\n'));
     // 定义一个正则拿到开发或者发布分支
     let req;
     if (type === VERSION_RELEASE) {
@@ -265,7 +266,7 @@ class Git {
       req = /.+?refs\/heads\/dev\/(\d+\.\d+\.\d+)/g;
     }
     // 获取到版本号数组
-    remoteList
+    remoteList = remoteList
       .split('\n')
       .map(remote => {
         const match = req.exec(remote);
@@ -285,18 +286,20 @@ class Git {
         }
         return 1;
       });
-
     return remoteList;
   }
 
   // 实现本地仓库初始化
   async init() {
-    // 以及初始化过仓库就不存在重新初始化，如果存在commit重新初始化 会丢失commit
+    // 已经初始化过仓库就不存在重新初始化，如果存在commit重新初始化 会丢失commit
     if (this.getRemote()) {
       return;
     }
     // 初始化git仓库和add remote关联远程仓库
     await this.initAndAddRemote();
+    // $ 初始化master分支 (自定义master分支 - 原课程没有)
+    // 4. 切换开发分支
+    await this.checkoutBranch('master');
     // 初始化提交
     await this.initCommit();
   }
@@ -336,15 +339,14 @@ class Git {
     const status = await this.git.status();
     // 所有可能导致未提交的状态都需要加上
     if (
-      status.no_added.length > 0 ||
+      status.not_added.length > 0 ||
       status.created.length > 0 ||
       status.deleted.length > 0 ||
       status.modified.length > 0 ||
       status.renamed.length > 0
     ) {
-      log.verbose('status', status);
       // 添加到本地暂存区域
-      await this.git.add(status.no_added);
+      await this.git.add(status.not_added);
       await this.git.add(status.created);
       await this.git.add(status.deleted);
       await this.git.add(status.modified);
@@ -376,14 +378,14 @@ class Git {
 
   // 推送远程仓库
   async pushRemoteRepo(branchName) {
-    log.info(`推送代码至${branchName}分支`);
+    log.info(`推送代码至[${branchName}]分支`);
     await this.git.push('origin', branchName);
     log.success('代码推送成功');
   }
 
   // 拉取远程仓库
   async pullRemoteRepo(branchName, option) {
-    log.info(`同步远程${branchName}分支代码`);
+    log.info(`同步远程[${branchName}]分支代码`);
     await this.git.pull('origin', branchName, option);
   }
 
@@ -566,14 +568,14 @@ class Git {
 
   // 检查并创建远程仓库
   async checkRepo() {
-    let repo = this.gitServer.getRepo(this.login, this.name);
+    let repo = await this.gitServer.getRepo(this.login, this.name);
     if (!repo) {
       let spinner = spinnerStart('开始创建远程仓库...');
       try {
         if (this.owner === REPO_OWNER_USER) {
-          repo = this.gitServer.createRepo(this.name);
+          repo = await this.gitServer.createRepo(this.name);
         } else {
-          repo = this.gitServer.createOrgRepo(this.name, this.login);
+          repo = await this.gitServer.createOrgRepo(this.name, this.login);
         }
       } catch (error) {
         log.error(error);
@@ -598,15 +600,15 @@ class Git {
       writeFile(
         gitIgnorePath,
         `.idea/
-      .DS_Store
-      node_modules/
-      package-lock.json
-      yarn.lock
-      .vscode/
-      .history/
-      logs/
-      target/
-      pid`
+.DS_Store
+node_modules/
+package-lock.json
+yarn.lock
+.vscode/
+.history/
+logs/
+target/
+pid`
       );
 
       log.success(`自动写入${GIT_IGNORE_FILE}文件成功`);
