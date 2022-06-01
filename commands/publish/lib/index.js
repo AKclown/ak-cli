@@ -46,7 +46,6 @@ class PublishCommand extends Command {
   prepare() {
     // 1. 确认项目是否为npm项目 （package.json是否存在）
     const projectPath = process.cwd();
-    console.log('projectPath: ', projectPath);
     const pkgPath = path.resolve(projectPath, 'package.json');
     if (!fse.pathExistsSync(pkgPath)) {
       throw new Error('package.json不存在');

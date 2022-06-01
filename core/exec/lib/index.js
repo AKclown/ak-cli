@@ -33,7 +33,6 @@ async function exec() {
   const cmdName = cmdObj.name();
   // 获取到对应的包名
   const packageName = SETTINGS[cmdName];
-  console.log('packageName: ', packageName);
   // 默认给定一个最新的版本号
   const packageVersion = 'latest';
   // $ 暂定
@@ -83,6 +82,7 @@ async function exec() {
         // 过滤掉集成参数和私有参数、以及parent
         Object.keys(cmd).forEach(key => {
           if (
+            // eslint-disable-next-line no-prototype-builtins
             cmd.hasOwnProperty(key) &&
             !key.startsWith('_') &&
             key !== 'parent'

@@ -30,7 +30,7 @@ class Github extends GitServer {
   }
 
   // 获取远程仓库
-  getRepo(login, name) {
+  async getRepo(login, name) {
     return this.request.get(`/repos/${login}/${name}`).then(response => {
       return this.handleResponse(response);
     });
@@ -50,8 +50,8 @@ class Github extends GitServer {
   }
 
   // 创建个人仓库
-  createRepo(name) {
-    this.request.post(
+  async createRepo(name) {
+    return this.request.post(
       '/user/repos',
       {
         name,
@@ -63,8 +63,8 @@ class Github extends GitServer {
   }
 
   // 创建组织仓库
-  createOrgRepo(name, login) {
-    this.request.post(
+  async createOrgRepo(name, login) {
+    return this.request.post(
       `/orgs/${login}/repos`,
       {
         name,

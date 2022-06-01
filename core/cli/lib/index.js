@@ -25,6 +25,7 @@ async function core() {
     checkUserHome();
     // checkInputArgs();
     checkEnv();
+    // !!! 网络不好暂时注释掉
     await checkGlobalUpdate();
     // $ 命令注册执行方法
     registerCommand();

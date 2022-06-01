@@ -5,7 +5,7 @@ class GithubRequest {
   constructor(token) {
     this.token = token;
     this.service = axios.create({
-      baseUrl: BASE_URL,
+      baseURL: BASE_URL,
       timeout: 6000,
     });
 

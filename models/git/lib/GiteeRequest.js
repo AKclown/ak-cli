@@ -1,5 +1,5 @@
 const axios = require('axios');
-const BASE_URL = 'https://gitee.com/api/v5';
+const BASE_URL = 'https://gitee.com/api';
 
 class GiteeRequest {
   constructor(token) {

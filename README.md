@@ -11,7 +11,7 @@ ak-cli init --targetPath /Users/ak/Desktop/project/ak-cli/commands/init --force 
 ### publish 命令
 
 ```
-ak-cli publish  --targetPath E:/project/project/ak-cli/core/cli/commands/publish
+ak-cli publish  --targetPath E:/project/project/ak-cli/commands/publish
 ```
 
 ### 提交规范

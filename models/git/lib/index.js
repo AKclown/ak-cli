@@ -256,7 +256,6 @@ class Git {
   async getRemoteBranchList(type) {
     // 通过git ls-remote来列出所有的远程分支
     let remoteList = await this.git.listRemote(['--refs']);
-    console.log('remoteList: ', remoteList.split('\n'));
     // 定义一个正则拿到开发或者发布分支
     let req;
     if (type === VERSION_RELEASE) {

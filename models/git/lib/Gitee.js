@@ -17,12 +17,12 @@ class Gitee extends GitServer {
 
   // 获取用户信息
   async getUser() {
-    return this.request.get('/users');
+    return this.request.get('/v5/users');
   }
 
   // 获取组织信息
   async getOrgs(username) {
-    return this.request.get(`/users/${username}/orgs`, {
+    return this.request.get(`/v5/users/${username}/orgs`, {
       // 目前不支持分页，尽可能展示多的数据，选择100条
       page: 1,
       per_page: 100,
@@ -30,8 +30,8 @@ class Gitee extends GitServer {
   }
 
   // 获取远程仓库
-  getRepo(login, name) {
-    return this.request.get(`/repos/${login}/${name}`).then(response => {
+  async getRepo(login, name) {
+    return this.request.get(`/v5/repos/${login}/${name}`).then(response => {
       return this.handleResponse(response);
     });
   }
@@ -50,13 +50,13 @@ class Gitee extends GitServer {
   }
 
   // 创建个人仓库
-  createRepo(name) {
-    this.request.post('/user/repos', { name });
+  async createRepo(name) {
+    return this.request.post('/v5/user/repos', { name });
   }
 
   // 创建组织仓库
-  createOrgRepo(name, login) {
-    this.request.post(`/orgs/${login}/repos`, { name });
+  async createOrgRepo(name, login) {
+    return this.request.post(`/v5/orgs/${login}/repos`, { name });
   }
 
   // 获取仓库地址
