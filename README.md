@@ -26,11 +26,13 @@ ak-cli publish  --targetPath E:/project/project/ak-cli/commands/publish
 4. @commitlint/config-conventional (安装符合 Angular 风格的校验规则)
 5. husky/lint-staged(git 钩子工具)
 
-### git 命令
-
 [git 命令](https://cloud.tencent.com/developer/section/1138701)
 
 [commit 参考文献](https://godbasin.github.io/2019/11/10/change-log/)
+
+### 演示
+
+![演示图](./doc/illustrate.png)
 
 ### 脚手架整体架构设计
 
