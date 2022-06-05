@@ -10,6 +10,7 @@ const terminalLink = require('terminal-link');
 const semver = require('semver');
 const Github = require('./Github');
 const Gitee = require('./Gitee');
+const CloudBuild = require('@ak-clown/cloudbuild');
 
 // 主目录
 const DEFAULT_CLI_HOME = '.ak-cli';
@@ -71,7 +72,12 @@ const VERSION_DEVELOP = 'dev';
 class Git {
   constructor(
     { name, version, dir },
-    { refreshServer = false, refreshToken = false, refreshOwner = false }
+    {
+      refreshServer = false,
+      refreshToken = false,
+      refreshOwner = false,
+      buildCmd = '',
+    }
   ) {
     // ! 这边null为什么要定义出来，好处是提醒自己和给其他人员能够清楚的知道这个类有哪些属性。很多知名的库，都会把类的属性写在构造函数里
     this.name = name; // 项目名称
@@ -90,6 +96,7 @@ class Git {
     this.refreshServer = refreshServer; // 是否强制刷新托管的git平台
     this.refreshToken = refreshToken; // 是否强制刷新远程仓库token
     this.refreshOwner = refreshOwner; // 是否强制刷新远程仓库类型
+    this.buildCmd = buildCmd; // 构建命令
   }
   // 准备工作，创建gitServer对象
   async prepare() {
@@ -127,6 +134,27 @@ class Git {
     await this.pullRemoteMaterAndBranch();
     // 6. 将开发分支推送到远程仓库
     await this.pushRemoteRepo(this.branch);
+  }
+
+  // 定义发布的过程
+  async publish() {
+    await this.preparePublish();
+    const cloudBuild = new CloudBuild(this, { buildCmd: this.buildCmd });
+    cloudBuild.init();
+  }
+
+  // 发布准备，做一些检查相关的操作
+  async preparePublish() {
+    // 检查build命令是否合法
+    if (this.buildCmd) {
+      const buildCmdArray = this.buildCmd.split(' '); // ['npm','run','build']
+      if (!['npm', 'cnpm'].includes(buildCmdArray[0])) {
+        throw new Error('Build命令非法, 必须使用npm或cnpm!');
+      }
+    } else {
+      // 构建命令未给定 - 设置默认命令
+      this.buildCmd = 'npm run build';
+    }
   }
 
   // 合并远程master分支和开发分支代码

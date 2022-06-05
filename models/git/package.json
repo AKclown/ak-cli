@@ -28,6 +28,8 @@
   },
   "dependencies": {
     "@ak-clown/utils": "file:../../utils/utils",
+    "@ak-clown/log": "file:../../utils/log",
+    "@ak-clown/cloudbuild": "file:../../models/cloudBuild",
     "axios": "^0.27.2",
     "fs-extra": "^10.1.0",
     "inquirer": "^8.2.4",

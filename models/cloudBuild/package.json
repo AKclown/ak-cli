@@ -26,6 +26,8 @@
     "url": "https://github.com/AKclown/ak-cli/issues"
   },
   "dependencies": {
+    "@ak-clown/log": "file:../../utils/log",
+    "lodash": "^4.17.21",
     "socket.io-client": "^2.0.0"
   }
 }
