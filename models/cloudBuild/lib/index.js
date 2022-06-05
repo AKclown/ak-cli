@@ -38,7 +38,12 @@ class CloudBuild {
   init() {
     const socket = io(WS_SERVER, {
       query: {
+        // 服务端需要下载源码、安装依赖。 需要客户端提供一些基础信息
         repo: this.git.remote,
+        name: this.git.name,
+        branch: this.git.branch,
+        version: this.git.version,
+        buildCmd: this.buildCmd,
       },
     });
 
