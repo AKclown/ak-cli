@@ -66,6 +66,7 @@ class PublishCommand extends Command {
 }
 
 function publish(args) {
+  console.log('args: ', args);
   // $ 这个args就是执行脚手架传入的参数
   return new PublishCommand(args);
 }

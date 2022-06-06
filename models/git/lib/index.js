@@ -140,7 +140,8 @@ class Git {
   async publish() {
     await this.preparePublish();
     const cloudBuild = new CloudBuild(this, { buildCmd: this.buildCmd });
-    cloudBuild.init();
+    await cloudBuild.init();
+    await cloudBuild.build();
   }
 
   // 发布准备，做一些检查相关的操作

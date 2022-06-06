@@ -24,7 +24,7 @@ async function exec() {
   // $ 指定的本地init地址
   let targetPath = process.env.CLI_TARGET_PATH;
   // userHome 用户主目录
-  const homePath = process.env.DEFAULT_CLI_HOME;
+  const homePath = process.env.CLI_HOME_PATH;
   log.verbose('targetPath', targetPath);
   log.verbose('homePath', homePath);
 
