@@ -11,7 +11,12 @@ const TIME_OUT = 5 * 60 * 1000;
 const WS_CONNECT_TIMEOUT = 5 * 1000;
 
 // socket错误code
-const FAILED_CODE = ['prepare failed'];
+const FAILED_CODE = [
+  'prepare failed',
+  'download failed',
+  'install failed',
+  'build failed',
+];
 
 // 解析socket的msg
 function parseMsg(msg) {
@@ -111,7 +116,7 @@ class CloudBuild {
         log.success(parsedMsg.action, parsedMsg.message);
       });
       this.socket.on('building', msg => {
-        console.log('msg: ', msg);
+        console.log(msg);
       });
     });
   }
