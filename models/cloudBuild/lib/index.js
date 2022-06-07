@@ -43,6 +43,12 @@ class CloudBuild {
     this.timer = setTimeout(fn, timeout);
   }
 
+  prepare() {
+    // 1. 获取OSS文件
+    // 2. 判断当前项目的OSS文件是否存在
+    // 3. 如果存在且处于正式发布，则询问用户是否进行覆盖安装 （测试环境直接覆盖即可）
+  }
+
   // 云构建初始化
   init() {
     return new Promise((resolve, reject) => {

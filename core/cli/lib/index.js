@@ -55,6 +55,7 @@ function registerCommand() {
     .option('--refreshToken', '强制更新远程仓库token')
     .option('--refreshOwner', '强制更新远程仓库类型')
     .option('--buildCmd <buildCmd>', '构建命令')
+    .option('--prod', '是否正式发布')
     .action(exec);
 
   // $ 指定targetPath

@@ -26,6 +26,8 @@ const GIT_OWN_FILE = '.git_own';
 const GIT_LOGIN_FILE = '.git_login';
 // .ignore文件
 const GIT_IGNORE_FILE = '.gitignore';
+// 静态资源服务器类型
+const GIT_PUBLISH_FILE = '.git_publish';
 
 // Git托管平台
 const GITHUB = 'github';
@@ -47,6 +49,7 @@ const GIT_SERVER_TYPE = [
 const REPO_OWNER_USER = 'user';
 const REPO_OWNER_ORG = 'org';
 
+// 仓库类型列表
 const GIt_OWNER_TYPE = [
   {
     name: '个人',
@@ -58,6 +61,7 @@ const GIt_OWNER_TYPE = [
   },
 ];
 
+// 仓库类型列表 (只存在个人)
 const GIt_OWNER_TYPE_ONLY = [
   {
     name: '个人',
@@ -69,6 +73,14 @@ const GIt_OWNER_TYPE_ONLY = [
 const VERSION_RELEASE = 'release';
 const VERSION_DEVELOP = 'dev';
 
+// 静态服务器列表
+const GIT_PUBLISH_TYPE = [
+  {
+    name: 'OSS',
+    value: 'oss',
+  },
+];
+
 class Git {
   constructor(
     { name, version, dir },
@@ -77,6 +89,7 @@ class Git {
       refreshToken = false,
       refreshOwner = false,
       buildCmd = '',
+      prod = false,
     }
   ) {
     // ! 这边null为什么要定义出来，好处是提醒自己和给其他人员能够清楚的知道这个类有哪些属性。很多知名的库，都会把类的属性写在构造函数里
@@ -97,6 +110,8 @@ class Git {
     this.refreshToken = refreshToken; // 是否强制刷新远程仓库token
     this.refreshOwner = refreshOwner; // 是否强制刷新远程仓库类型
     this.buildCmd = buildCmd; // 构建命令
+    this.gitPublish = null; // 静态资源服务器类型
+    this.prod = prod; // 是否为正式环境
   }
   // 准备工作，创建gitServer对象
   async prepare() {
@@ -139,7 +154,13 @@ class Git {
   // 定义发布的过程
   async publish() {
     await this.preparePublish();
-    const cloudBuild = new CloudBuild(this, { buildCmd: this.buildCmd });
+    const cloudBuild = new CloudBuild(this, {
+      buildCmd: this.buildCmd,
+      type: this.gitPublish,
+      prod: this.prod,
+    });
+    // oss项目处理
+    await cloudBuild.prepare();
     await cloudBuild.init();
     await cloudBuild.build();
   }
@@ -166,6 +187,35 @@ class Git {
       throw new Error(this.buildCmd + '命令不存在');
     }
     log.success('代码预检查通过');
+    // 检查静态服务器类型
+    await this.checkPublishType();
+  }
+
+  // 检查静态服务器类型
+  async checkPublishType() {
+    const gitPublishPath = this.createPath(GIT_PUBLISH_FILE);
+    // 读取到GIT_TOKEN_FILE的文件内容
+    let gitPublish = readFile(gitPublishPath);
+    if (!gitPublish) {
+      gitPublish = (
+        await inquirer.prompt([
+          {
+            type: 'list',
+            name: 'gitPublish',
+            message: '请选择您想要上传代码的平台',
+            choices: GIT_PUBLISH_TYPE,
+          },
+        ])
+      ).gitPublish;
+      writeFile(gitPublishPath, gitPublish);
+      log.success(
+        'git publish类型写入成功',
+        `${gitPublish} -> ${gitPublishPath}`
+      );
+    } else {
+      log.success('git publish类型获取成功', gitPublish);
+    }
+    this.gitPublish = gitPublish;
   }
 
   // 获取到package.json文件
