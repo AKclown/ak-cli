@@ -146,6 +146,10 @@ class Git {
 
   // 发布准备，做一些检查相关的操作
   async preparePublish() {
+    log.info('开始云构建时的代码检查');
+    // 检查项目是否为前端项目
+    const pkg = this.getPackageJson();
+
     // 检查build命令是否合法
     if (this.buildCmd) {
       const buildCmdArray = this.buildCmd.split(' '); // ['npm','run','build']
@@ -156,6 +160,21 @@ class Git {
       // 构建命令未给定 - 设置默认命令
       this.buildCmd = 'npm run build';
     }
+    const buildCmdArray = this.buildCmd.split(' ');
+    const lastCmd = buildCmdArray[buildCmdArray.length - 1];
+    if (!pkg.script || !Object.keys(pkg.script).includes(lastCmd)) {
+      throw new Error(this.buildCmd + '命令不存在');
+    }
+    log.success('代码预检查通过');
+  }
+
+  // 获取到package.json文件
+  getPackageJson() {
+    const pkgPath = path.resolve(this.dir, 'package.json');
+    if (!fse.pathExistsSync(pkgPath)) {
+      throw new Error(`package.json不存在！源码目录: ${this.dir}`);
+    }
+    return fse.readJsonSync(pkgPath);
   }
 
   // 合并远程master分支和开发分支代码

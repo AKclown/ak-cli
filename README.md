@@ -46,9 +46,9 @@ ak-cli publish  --targetPath E:/project/project/ak-cli/commands/publish
 
 ![脚手架发布整体架构设计](./doc/diagram/publish-architecture-design.png)
 
-### 云构建/云发布
+<!-- ### 云构建/云发布
 
-![云构建执行流程](./doc/diagram/cloud-build-logic.png)
+![云构建执行流程](./doc/diagram/cloud-build-logic.png) -->
 
 ### 注意
 
