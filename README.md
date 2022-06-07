@@ -46,6 +46,10 @@ ak-cli publish  --targetPath E:/project/project/ak-cli/commands/publish
 
 ![脚手架发布整体架构设计](./doc/diagram/publish-architecture-design.png)
 
+### 云构建/云发布
+
+![云构建执行流程](./doc/diagram/cloud-build-logic.png)
+
 ### 注意
 
 1. 使用 npm 无法在 script 命令后面加一些参数， 但是 yarn 可以，所以 husky 中的命令使用 yarn 运行
